@@ -73,12 +73,11 @@
               <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Audio Source</label>
               <select id="audioSourceType" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-400 transition">
                 <option value="custom-speech">🗣️ Custom AI Voice Message (Set Below)</option>
-                <optgroup label="Nature & Animal Soundscapes">
+                <optgroup label="Nature & Audio Soundscapes">
                   <option value="sound-rain">🌧️ Gentle Rain Soundscape</option>
                   <option value="sound-stream">🌊 Babbling Stream Soundscape</option>
-                  <option value="sound-birds">🐦 Songbirds Singing (Realistic Recording)</option>
+                  <option value="sound-birds">🎵 Song</option>
                   <option value="sound-dog">🐶 Dog Bark (Realistic Recording)</option>
-                  <option value="sound-cat">🐱 Cat Meow (Realistic Recording)</option>
                 </optgroup>
                 <optgroup label="Your Saved Voice Recordings" id="recordingsOptGroup">
                   <!-- Custom recordings populate here -->
@@ -138,7 +137,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
           <h2 class="text-lg font-semibold text-slate-200 flex items-center space-x-2">
             <i class="fa-solid fa-sliders text-amber-400"></i>
-            <span>Voices & Realistic Sounds Studio</span>
+            <span>Voices & Audio Studio</span>
           </h2>
 
           <!-- Gender Category Tabs -->
@@ -165,9 +164,9 @@
             </button>
           </div>
 
-          <!-- Nature & Animal Sounds Selector -->
+          <!-- Nature & Audio Sounds Selector -->
           <div id="natureSoundsContainer" class="hidden space-y-2">
-            <label class="block text-xs text-slate-400 mb-1">Instant Soundscape Preview:</label>
+            <label class="block text-xs text-slate-400 mb-1">Instant Sound Preview:</label>
             <div class="grid grid-cols-2 gap-2 text-xs">
               <button onclick="playSound('sound-rain')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🌧️ Gentle Rain</span>
@@ -176,13 +175,10 @@
                 <span>🌊 Stream</span>
               </button>
               <button onclick="playSound('sound-birds')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
-                <span>🐦 Songbirds</span>
+                <span>🎵 Song</span>
               </button>
               <button onclick="playSound('sound-dog')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🐶 Dog Bark</span>
-              </button>
-              <button onclick="playSound('sound-cat')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2 col-span-2">
-                <span>🐱 Realistic Cat Meow</span>
               </button>
             </div>
             <button onclick="stopSound()" class="w-full mt-2 bg-red-950/40 border border-red-800 text-red-300 py-1.5 rounded-lg text-xs">
@@ -294,9 +290,8 @@
     let audioCtx = null;
     let activeSoundNode = null;
 
-    // Realistic Recorded Sound URLs (Updated to universal MP3s for compatibility)
+    // Realistic Recorded Sound URLs
     const soundUrls = {
-      'sound-cat': 'https://cdn.pixabay.com/download/audio/2022/03/24/audio_c8c8a73467.mp3',
       'sound-dog': 'https://actions.google.com/sounds/v1/animals/dog_barking.ogg',
       'sound-birds': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3'
     };
@@ -677,9 +672,8 @@
           const names = {
             'sound-rain': '🌧️ Gentle Rain',
             'sound-stream': '🌊 Babbling Stream',
-            'sound-birds': '🐦 Songbirds Singing',
-            'sound-dog': '🐶 Realistic Dog Bark',
-            'sound-cat': '🐱 Realistic Cat Meow'
+            'sound-birds': '🎵 Song',
+            'sound-dog': '🐶 Realistic Dog Bark'
           };
           audioLabel = names[alarm.audioSource] || alarm.audioSource;
         } else if (alarm.audioSource !== 'custom-speech') {
@@ -876,9 +870,8 @@
         const soundNames = {
           'sound-rain': '🌧️ Gentle Rain Soundscape',
           'sound-stream': '🌊 Babbling Stream Soundscape',
-          'sound-birds': '🐦 Realistic Songbirds',
-          'sound-dog': '🐶 Realistic Dog Bark',
-          'sound-cat': '🐱 Realistic Cat Meow'
+          'sound-birds': '🎵 Song',
+          'sound-dog': '🐶 Realistic Dog Bark'
         };
         if (modalAudioTitle) modalAudioTitle.textContent = soundNames[alarm.audioSource] || "Nature Soundscape";
         playSound(alarm.audioSource);
