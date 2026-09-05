@@ -76,9 +76,9 @@
                 <optgroup label="Nature & Animal Soundscapes">
                   <option value="sound-rain">🌧️ Gentle Rain Soundscape</option>
                   <option value="sound-stream">🌊 Babbling Stream Soundscape</option>
-                  <option value="sound-birds">🐦 Birds Singing Chirp</option>
-                  <option value="sound-dog">🐶 Dog Bark ("Woof Woof!")</option>
-                  <option value="sound-cat">🐱 Cat Meow ("Meow!")</option>
+                  <option value="sound-birds">🐦 Songbirds Singing (Realistic Recording)</option>
+                  <option value="sound-dog">🐶 Dog Bark (Realistic Recording)</option>
+                  <option value="sound-cat">🐱 Cat Meow (Realistic Recording)</option>
                 </optgroup>
                 <optgroup label="Your Saved Voice Recordings" id="recordingsOptGroup">
                   <!-- Custom recordings populate here -->
@@ -138,7 +138,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
           <h2 class="text-lg font-semibold text-slate-200 flex items-center space-x-2">
             <i class="fa-solid fa-sliders text-amber-400"></i>
-            <span>Voices & Sound Effects Studio</span>
+            <span>Voices & Realistic Sounds Studio</span>
           </h2>
 
           <!-- Gender Category Tabs -->
@@ -170,19 +170,19 @@
             <label class="block text-xs text-slate-400 mb-1">Instant Soundscape Preview:</label>
             <div class="grid grid-cols-2 gap-2 text-xs">
               <button onclick="playSound('sound-rain')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
-                <span>🌧️ Rain</span>
+                <span>🌧️ Gentle Rain</span>
               </button>
               <button onclick="playSound('sound-stream')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🌊 Stream</span>
               </button>
               <button onclick="playSound('sound-birds')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
-                <span>🐦 Birds</span>
+                <span>🐦 Songbirds</span>
               </button>
               <button onclick="playSound('sound-dog')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🐶 Dog Bark</span>
               </button>
               <button onclick="playSound('sound-cat')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2 col-span-2">
-                <span>🐱 Cat Meow</span>
+                <span>🐱 Realistic Cat Meow</span>
               </button>
             </div>
             <button onclick="stopSound()" class="w-full mt-2 bg-red-950/40 border border-red-800 text-red-300 py-1.5 rounded-lg text-xs">
@@ -290,10 +290,16 @@
     let currentPlayingAudio = null;
     let db;
 
-    // Web Audio Synthesizer Context for Soundscapes & Animals
+    // Web Audio Synthesizer Context for Rain/Stream
     let audioCtx = null;
     let activeSoundNode = null;
-    let activeSoundInterval = null;
+
+    // Realistic Recorded Sound URLs
+    const soundUrls = {
+      'sound-cat': 'https://actions.google.com/sounds/v1/animals/cat_meow.ogg',
+      'sound-dog': 'https://actions.google.com/sounds/v1/animals/dog_barking.ogg',
+      'sound-birds': 'https://actions.google.com/sounds/v1/ambiences/outdoor_birds.ogg'
+    };
 
     // Media Recorder Variables
     let mediaRecorder;
@@ -345,7 +351,6 @@
     // Default template on load
     customSpeechText.value = templates[1];
 
-    // Web Audio Synthesizers (Rain, Stream, Birds, Dog, Cat)
     function getAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -361,17 +366,17 @@
         try { activeSoundNode.stop(); } catch(e){}
         activeSoundNode = null;
       }
-      if (activeSoundInterval) {
-        clearInterval(activeSoundInterval);
-        activeSoundInterval = null;
+      if (currentPlayingAudio) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio = null;
       }
     }
 
     function playSound(type) {
       stopSound();
-      const ctx = getAudioContext();
 
       if (type === 'sound-rain' || type === 'sound-stream') {
+        const ctx = getAudioContext();
         const bufferSize = ctx.sampleRate * 2;
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -403,70 +408,10 @@
         noise.start();
         activeSoundNode = noise;
 
-      } else if (type === 'sound-birds') {
-        const playChirp = () => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          const startFreq = 2200 + Math.random() * 800;
-          osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(startFreq + 600, ctx.currentTime + 0.1);
-          osc.frequency.exponentialRampToValueAtTime(startFreq - 300, ctx.currentTime + 0.2);
-
-          gain.gain.setValueAtTime(0.3, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.25);
-        };
-        playChirp();
-        activeSoundInterval = setInterval(playChirp, 800);
-
-      } else if (type === 'sound-dog') {
-        const playBark = () => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(300, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.18);
-
-          gain.gain.setValueAtTime(0.6, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.2);
-        };
-        playBark();
-        setTimeout(playBark, 250);
-        activeSoundInterval = setInterval(() => {
-          playBark();
-          setTimeout(playBark, 250);
-        }, 1500);
-
-      } else if (type === 'sound-cat') {
-        const playMeow = () => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(400, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(750, ctx.currentTime + 0.25);
-          osc.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + 0.6);
-
-          gain.gain.setValueAtTime(0.01, ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.2);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.65);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.65);
-        };
-        playMeow();
-        activeSoundInterval = setInterval(playMeow, 2000);
+      } else if (soundUrls[type]) {
+        currentPlayingAudio = new Audio(soundUrls[type]);
+        currentPlayingAudio.loop = true;
+        currentPlayingAudio.play().catch(e => console.error('Audio play error:', e));
       }
     }
 
@@ -531,10 +476,10 @@
       let filtered = [];
       if (currentGenderFilter === 'male') {
         filtered = allSystemVoices.filter(v => maleKeywords.some(kw => v.name.toLowerCase().includes(kw)));
-        if (filtered.length === 0) filtered = allSystemVoices; // Fallback
+        if (filtered.length === 0) filtered = allSystemVoices;
       } else {
         filtered = allSystemVoices.filter(v => femaleKeywords.some(kw => v.name.toLowerCase().includes(kw)));
-        if (filtered.length === 0) filtered = allSystemVoices; // Fallback
+        if (filtered.length === 0) filtered = allSystemVoices;
       }
 
       voiceSelectDropdown.innerHTML = '';
@@ -721,9 +666,9 @@
           const names = {
             'sound-rain': '🌧️ Gentle Rain',
             'sound-stream': '🌊 Babbling Stream',
-            'sound-birds': '🐦 Birds Chirping',
-            'sound-dog': '🐶 Dog Bark',
-            'sound-cat': '🐱 Cat Meow'
+            'sound-birds': '🐦 Songbirds Singing',
+            'sound-dog': '🐶 Realistic Dog Bark',
+            'sound-cat': '🐱 Realistic Cat Meow'
           };
           audioLabel = names[alarm.audioSource] || alarm.audioSource;
         } else if (alarm.audioSource !== 'custom-speech') {
@@ -904,9 +849,9 @@
         const soundNames = {
           'sound-rain': '🌧️ Gentle Rain Soundscape',
           'sound-stream': '🌊 Babbling Stream Soundscape',
-          'sound-birds': '🐦 Birds Chirping Soundscape',
-          'sound-dog': '🐶 Dog Bark Directive',
-          'sound-cat': '🐱 Cat Meow Directive'
+          'sound-birds': '🐦 Realistic Songbirds',
+          'sound-dog': '🐶 Realistic Dog Bark',
+          'sound-cat': '🐱 Realistic Cat Meow'
         };
         modalAudioTitle.textContent = soundNames[alarm.audioSource] || "Nature Soundscape";
         playSound(alarm.audioSource);
