@@ -73,6 +73,13 @@
               <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Audio Source</label>
               <select id="audioSourceType" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-400 transition">
                 <option value="custom-speech">🗣️ Custom AI Voice Message (Set Below)</option>
+                <optgroup label="Nature & Animal Soundscapes">
+                  <option value="sound-rain">🌧️ Gentle Rain Soundscape</option>
+                  <option value="sound-stream">🌊 Babbling Stream Soundscape</option>
+                  <option value="sound-birds">🐦 Birds Singing Chirp</option>
+                  <option value="sound-dog">🐶 Dog Bark ("Woof Woof!")</option>
+                  <option value="sound-cat">🐱 Cat Meow ("Meow!")</option>
+                </optgroup>
                 <optgroup label="Your Saved Voice Recordings" id="recordingsOptGroup">
                   <!-- Custom recordings populate here -->
                 </optgroup>
@@ -127,34 +134,61 @@
       <!-- Column 2: Voice Studio, Voice Selector & Saved Library -->
       <div class="space-y-6">
 
-        <!-- Male & Female AI Voice Selector Panel -->
+        <!-- AI Voice & Sound Preview Panel -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
           <h2 class="text-lg font-semibold text-slate-200 flex items-center space-x-2">
-            <i class="fa-solid fa-user-gear text-amber-400"></i>
-            <span>AI Voice Settings (Male & Female)</span>
+            <i class="fa-solid fa-sliders text-amber-400"></i>
+            <span>Voices & Sound Effects Studio</span>
           </h2>
 
           <!-- Gender Category Tabs -->
-          <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-lg border border-slate-800">
-            <button id="tabFemale" onclick="setGenderFilter('female')" class="py-1.5 text-xs font-semibold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              <i class="fa-solid fa-venus mr-1"></i> Female Voices
+          <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-950 rounded-lg border border-slate-800 text-[11px] font-semibold">
+            <button id="tabFemale" onclick="setGenderFilter('female')" class="py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <i class="fa-solid fa-venus mr-1"></i> Female
             </button>
-            <button id="tabMale" onclick="setGenderFilter('male')" class="py-1.5 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200">
-              <i class="fa-solid fa-mars mr-1"></i> Male Voices
+            <button id="tabMale" onclick="setGenderFilter('male')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">
+              <i class="fa-solid fa-mars mr-1"></i> Male
+            </button>
+            <button id="tabNature" onclick="setGenderFilter('nature')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">
+              <i class="fa-solid fa-tree mr-1"></i> Sounds
             </button>
           </div>
 
-          <div>
+          <div id="voiceDropdownContainer">
             <label class="block text-xs text-slate-400 mb-1.5">Selected Voice Model:</label>
             <select id="voiceSelectDropdown" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
               <option value="">Detecting device voice engine...</option>
             </select>
+            <button onclick="testSelectedVoice()" class="w-full mt-3 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-circle-play"></i>
+              <span>Test Selected Voice</span>
+            </button>
           </div>
 
-          <button onclick="testSelectedVoice()" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center space-x-1.5">
-            <i class="fa-solid fa-circle-play"></i>
-            <span>Test Selected Voice</span>
-          </button>
+          <!-- Nature & Animal Sounds Selector -->
+          <div id="natureSoundsContainer" class="hidden space-y-2">
+            <label class="block text-xs text-slate-400 mb-1">Instant Soundscape Preview:</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="playSound('sound-rain')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+                <span>🌧️ Rain</span>
+              </button>
+              <button onclick="playSound('sound-stream')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+                <span>🌊 Stream</span>
+              </button>
+              <button onclick="playSound('sound-birds')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+                <span>🐦 Birds</span>
+              </button>
+              <button onclick="playSound('sound-dog')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+                <span>🐶 Dog Bark</span>
+              </button>
+              <button onclick="playSound('sound-cat')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2 col-span-2">
+                <span>🐱 Cat Meow</span>
+              </button>
+            </div>
+            <button onclick="stopSound()" class="w-full mt-2 bg-red-950/40 border border-red-800 text-red-300 py-1.5 rounded-lg text-xs">
+              Stop Sound Preview
+            </button>
+          </div>
         </div>
 
         <!-- Voice Recorder Studio -->
@@ -256,6 +290,11 @@
     let currentPlayingAudio = null;
     let db;
 
+    // Web Audio Synthesizer Context for Soundscapes & Animals
+    let audioCtx = null;
+    let activeSoundNode = null;
+    let activeSoundInterval = null;
+
     // Media Recorder Variables
     let mediaRecorder;
     let audioChunks = [];
@@ -283,6 +322,9 @@
 
     const tabFemale = document.getElementById('tabFemale');
     const tabMale = document.getElementById('tabMale');
+    const tabNature = document.getElementById('tabNature');
+    const voiceDropdownContainer = document.getElementById('voiceDropdownContainer');
+    const natureSoundsContainer = document.getElementById('natureSoundsContainer');
 
     const recordBtn = document.getElementById('recordBtn');
     const stopRecordBtn = document.getElementById('stopRecordBtn');
@@ -302,6 +344,131 @@
 
     // Default template on load
     customSpeechText.value = templates[1];
+
+    // Web Audio Synthesizers (Rain, Stream, Birds, Dog, Cat)
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function stopSound() {
+      if (activeSoundNode) {
+        try { activeSoundNode.stop(); } catch(e){}
+        activeSoundNode = null;
+      }
+      if (activeSoundInterval) {
+        clearInterval(activeSoundInterval);
+        activeSoundInterval = null;
+      }
+    }
+
+    function playSound(type) {
+      stopSound();
+      const ctx = getAudioContext();
+
+      if (type === 'sound-rain' || type === 'sound-stream') {
+        const bufferSize = ctx.sampleRate * 2;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        
+        for (let i = 0; i < bufferSize; i++) {
+          let white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+          data[i] *= 0.11;
+          b6 = white * 0.115926;
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = type === 'sound-rain' ? 'lowpass' : 'bandpass';
+        filter.frequency.value = type === 'sound-rain' ? 1000 : 800;
+
+        noise.connect(filter);
+        filter.connect(ctx.destination);
+        noise.start();
+        activeSoundNode = noise;
+
+      } else if (type === 'sound-birds') {
+        const playChirp = () => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          const startFreq = 2200 + Math.random() * 800;
+          osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(startFreq + 600, ctx.currentTime + 0.1);
+          osc.frequency.exponentialRampToValueAtTime(startFreq - 300, ctx.currentTime + 0.2);
+
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+        };
+        playChirp();
+        activeSoundInterval = setInterval(playChirp, 800);
+
+      } else if (type === 'sound-dog') {
+        const playBark = () => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(300, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.18);
+
+          gain.gain.setValueAtTime(0.6, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.2);
+        };
+        playBark();
+        setTimeout(playBark, 250);
+        activeSoundInterval = setInterval(() => {
+          playBark();
+          setTimeout(playBark, 250);
+        }, 1500);
+
+      } else if (type === 'sound-cat') {
+        const playMeow = () => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(750, ctx.currentTime + 0.25);
+          osc.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + 0.6);
+
+          gain.gain.setValueAtTime(0.01, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.65);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.65);
+        };
+        playMeow();
+        activeSoundInterval = setInterval(playMeow, 2000);
+      }
+    }
 
     // IndexedDB Setup for Audio Files
     function initDB() {
@@ -386,14 +553,29 @@
 
     function setGenderFilter(gender) {
       currentGenderFilter = gender;
+      stopSound();
+
       if (gender === 'female') {
-        tabFemale.className = "py-1.5 text-xs font-semibold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        tabMale.className = "py-1.5 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200";
+        tabFemale.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        tabMale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        tabNature.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        voiceDropdownContainer.classList.remove('hidden');
+        natureSoundsContainer.classList.add('hidden');
+        loadAndFilterVoices();
+      } else if (gender === 'male') {
+        tabMale.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        tabFemale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        tabNature.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        voiceDropdownContainer.classList.remove('hidden');
+        natureSoundsContainer.classList.add('hidden');
+        loadAndFilterVoices();
       } else {
-        tabMale.className = "py-1.5 text-xs font-semibold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        tabFemale.className = "py-1.5 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200";
+        tabNature.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        tabFemale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        tabMale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        voiceDropdownContainer.classList.add('hidden');
+        natureSoundsContainer.classList.remove('hidden');
       }
-      loadAndFilterVoices();
     }
 
     voiceSelectDropdown.addEventListener('change', (e) => {
@@ -502,6 +684,7 @@
     }
 
     window.playSavedAudio = function(id) {
+      stopSound();
       const rec = customAudioList.find(r => r.id === id);
       if (rec) {
         if (currentPlayingAudio) currentPlayingAudio.pause();
@@ -534,7 +717,16 @@
         item.className = "bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between";
         
         let audioLabel = "Custom AI Speech Message";
-        if (alarm.audioSource !== 'custom-speech') {
+        if (alarm.audioSource.startsWith('sound-')) {
+          const names = {
+            'sound-rain': '🌧️ Gentle Rain',
+            'sound-stream': '🌊 Babbling Stream',
+            'sound-birds': '🐦 Birds Chirping',
+            'sound-dog': '🐶 Dog Bark',
+            'sound-cat': '🐱 Cat Meow'
+          };
+          audioLabel = names[alarm.audioSource] || alarm.audioSource;
+        } else if (alarm.audioSource !== 'custom-speech') {
           const rec = customAudioList.find(r => r.id === alarm.audioSource);
           if (rec) audioLabel = `🎙️ ${rec.title}`;
         }
@@ -708,7 +900,17 @@
       alarmModal.classList.remove('hidden');
       alarmModal.classList.add('flex');
 
-      if (alarm.audioSource === 'custom-speech') {
+      if (alarm.audioSource.startsWith('sound-')) {
+        const soundNames = {
+          'sound-rain': '🌧️ Gentle Rain Soundscape',
+          'sound-stream': '🌊 Babbling Stream Soundscape',
+          'sound-birds': '🐦 Birds Chirping Soundscape',
+          'sound-dog': '🐶 Dog Bark Directive',
+          'sound-cat': '🐱 Cat Meow Directive'
+        };
+        modalAudioTitle.textContent = soundNames[alarm.audioSource] || "Nature Soundscape";
+        playSound(alarm.audioSource);
+      } else if (alarm.audioSource === 'custom-speech') {
         const text = alarm.customText || "Time to take action and achieve your goal.";
         modalAudioTitle.textContent = `"${text}"`;
         speakText(text);
@@ -729,6 +931,7 @@
 
     dismissBtn.addEventListener('click', () => {
       window.speechSynthesis.cancel();
+      stopSound();
       if (currentPlayingAudio) {
         currentPlayingAudio.pause();
         currentPlayingAudio = null;
@@ -740,6 +943,7 @@
 
     snoozeBtn.addEventListener('click', () => {
       window.speechSynthesis.cancel();
+      stopSound();
       if (currentPlayingAudio) {
         currentPlayingAudio.pause();
         currentPlayingAudio = null;
