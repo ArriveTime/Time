@@ -23,6 +23,10 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg);
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="h-full flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
@@ -56,11 +60,11 @@
             <span>Set New Success Alarm / Reminder</span>
           </h2>
 
-          <form id="alarmForm" class="space-y-4">
+          <form id="alarmForm" class="space-y-4" novalidate>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Time</label>
-                <input type="time" id="alarmTime" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-lg focus:outline-none focus:border-amber-400 transition">
+                <input type="time" id="alarmTime" required step="60" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-lg focus:outline-none focus:border-amber-400 transition">
               </div>
 
               <div>
@@ -142,13 +146,13 @@
 
           <!-- Gender Category Tabs -->
           <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-950 rounded-lg border border-slate-800 text-[11px] font-semibold">
-            <button id="tabFemale" onclick="setGenderFilter('female')" class="py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            <button id="tabFemale" type="button" onclick="setGenderFilter('female')" class="py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">
               <i class="fa-solid fa-venus mr-1"></i> Female
             </button>
-            <button id="tabMale" onclick="setGenderFilter('male')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">
+            <button id="tabMale" type="button" onclick="setGenderFilter('male')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">
               <i class="fa-solid fa-mars mr-1"></i> Male
             </button>
-            <button id="tabNature" onclick="setGenderFilter('nature')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">
+            <button id="tabNature" type="button" onclick="setGenderFilter('nature')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">
               <i class="fa-solid fa-tree mr-1"></i> Sounds
             </button>
           </div>
@@ -158,7 +162,7 @@
             <select id="voiceSelectDropdown" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
               <option value="">Detecting device voice engine...</option>
             </select>
-            <button onclick="testSelectedVoice()" class="w-full mt-3 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center space-x-1.5">
+            <button type="button" onclick="testSelectedVoice()" class="w-full mt-3 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center space-x-1.5">
               <i class="fa-solid fa-circle-play"></i>
               <span>Test Selected Voice</span>
             </button>
@@ -168,20 +172,20 @@
           <div id="natureSoundsContainer" class="hidden space-y-2">
             <label class="block text-xs text-slate-400 mb-1">Instant Sound Preview:</label>
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <button onclick="playSound('sound-rain')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+              <button type="button" onclick="playSound('sound-rain')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🌧️ Gentle Rain</span>
               </button>
-              <button onclick="playSound('sound-stream')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+              <button type="button" onclick="playSound('sound-stream')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🌊 Stream</span>
               </button>
-              <button onclick="playSound('sound-birds')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+              <button type="button" onclick="playSound('sound-birds')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🎵 Song</span>
               </button>
-              <button onclick="playSound('sound-dog')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
+              <button type="button" onclick="playSound('sound-dog')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded-lg text-slate-200 flex items-center space-x-2">
                 <span>🐶 Dog Bark</span>
               </button>
             </div>
-            <button onclick="stopSound()" class="w-full mt-2 bg-red-950/40 border border-red-800 text-red-300 py-1.5 rounded-lg text-xs">
+            <button type="button" onclick="stopSound()" class="w-full mt-2 bg-red-950/40 border border-red-800 text-red-300 py-1.5 rounded-lg text-xs">
               Stop Sound Preview
             </button>
           </div>
@@ -199,10 +203,10 @@
             <div id="recordTimer" class="font-mono text-2xl text-slate-400">00:00</div>
             
             <div class="flex justify-center items-center space-x-3">
-              <button id="recordBtn" class="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition active:scale-95">
+              <button type="button" id="recordBtn" class="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition active:scale-95">
                 <i class="fa-solid fa-microphone text-lg"></i>
               </button>
-              <button id="stopRecordBtn" disabled class="w-12 h-12 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center transition cursor-not-allowed">
+              <button type="button" id="stopRecordBtn" disabled class="w-12 h-12 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center transition cursor-not-allowed">
                 <i class="fa-solid fa-square text-lg"></i>
               </button>
             </div>
@@ -213,7 +217,7 @@
           <div id="recordingSaveContainer" class="hidden mt-4 space-y-3 border-t border-slate-800 pt-4">
             <audio id="audioPreview" controls class="w-full h-8 rounded-lg bg-slate-950"></audio>
             <input type="text" id="recordingTitle" placeholder="Memo Title (e.g., Morning Focus Goal)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
-            <button id="saveRecordingBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-medium py-2 rounded-lg text-sm transition">
+            <button type="button" id="saveRecordingBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-medium py-2 rounded-lg text-sm transition">
               Save Recording to Library
             </button>
           </div>
@@ -265,10 +269,10 @@
       </div>
 
       <div class="flex flex-col space-y-3 pt-2">
-        <button id="dismissBtn" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl shadow-lg hover:brightness-110 transition text-base">
+        <button id="dismissBtn" type="button" class="w-full gold-gradient text-slate-950 font-bold py-3.5 rounded-xl shadow-lg hover:brightness-110 transition text-base">
           DISMISS & TAKE ACTION
         </button>
-        <button id="snoozeBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-xl text-sm transition border border-slate-700">
+        <button id="snoozeBtn" type="button" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-xl text-sm transition border border-slate-700">
           Snooze 5 Minutes
         </button>
       </div>
@@ -625,8 +629,8 @@
             <div class="text-xs text-slate-500">${rec.date || 'Saved Voice Recording'}</div>
           </div>
           <div class="flex items-center space-x-2">
-            <button onclick="playSavedAudio('${rec.id}')" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            <button onclick="deleteSavedAudio('${rec.id}')" class="text-slate-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
+            <button type="button" onclick="playSavedAudio('${rec.id}')" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
+            <button type="button" onclick="deleteSavedAudio('${rec.id}')" class="text-slate-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
           </div>
         `;
         savedRecordingsList.appendChild(item);
@@ -689,7 +693,7 @@
               <div class="text-xs text-slate-500">${audioLabel}</div>
             </div>
           </div>
-          <button onclick="deleteAlarm('${alarm.id}')" class="text-slate-500 hover:text-red-400 p-2 transition">
+          <button type="button" onclick="deleteAlarm('${alarm.id}')" class="text-slate-500 hover:text-red-400 p-2 transition">
             <i class="fa-solid fa-trash-can"></i>
           </button>
         `;
@@ -698,20 +702,43 @@
     }
 
     function format12Hour(timeStr) {
+      if (!timeStr) return '';
       const [h, m] = timeStr.split(':');
       let hour = parseInt(h, 10);
+      if (isNaN(hour)) return timeStr;
       const ampm = hour >= 12 ? 'PM' : 'AM';
       hour = hour % 12 || 12;
-      return `${hour.toString().padStart(2, '0')}:${m} ${ampm}`;
+      return `${hour.toString().padStart(2, '0')}:${m || '00'} ${ampm}`;
     }
 
     if (alarmForm) {
       alarmForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const timeVal = document.getElementById('alarmTime').value;
-        const labelVal = document.getElementById('alarmLabel').value;
+        const timeInput = document.getElementById('alarmTime');
+        const labelInput = document.getElementById('alarmLabel');
+        
+        let timeVal = timeInput.value ? timeInput.value.trim() : '';
+        const labelVal = labelInput.value ? labelInput.value.trim() : '';
         const sourceVal = audioSourceTypeSelect.value;
         const messageTextVal = customSpeechText ? customSpeechText.value : '';
+
+        // If time field is empty or partial, alert clearly
+        if (!timeVal) {
+          alert("Please enter a valid time (e.g. 08:30 AM).");
+          timeInput.focus();
+          return;
+        }
+
+        // Format to HH:MM (strip seconds if present)
+        if (timeVal.length > 5) {
+          timeVal = timeVal.substring(0, 5);
+        }
+
+        if (!labelVal) {
+          alert("Please enter an objective or label for your alarm.");
+          labelInput.focus();
+          return;
+        }
 
         const newAlarm = {
           id: 'alarm_' + Date.now(),
@@ -724,7 +751,7 @@
         alarms.push(newAlarm);
         localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
         renderAlarms();
-        document.getElementById('alarmLabel').value = '';
+        labelInput.value = '';
       });
     }
 
