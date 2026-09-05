@@ -23,17 +23,13 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .gold-border {
-      border-color: #d4af37;
-    }
   </style>
 </head>
 <body class="h-full flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
 
-  <!-- Main Container -->
   <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-6">
 
-    <!-- Top Navigation Bar -->
+    <!-- Top Navigation -->
     <header class="flex items-center justify-between border-b border-slate-800 pb-4">
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/10">
@@ -49,13 +45,11 @@
       </div>
     </header>
 
-    <!-- App Dashboard Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
 
-      <!-- Column 1: Alarm Creation & Management -->
+      <!-- Column 1: Alarm Creation & Active Alarms -->
       <div class="lg:col-span-2 space-y-6">
 
-        <!-- Quick Alarm Setup Form -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
           <h2 class="text-lg font-semibold text-slate-200 mb-4 flex items-center space-x-2">
             <i class="fa-solid fa-plus-circle text-amber-400"></i>
@@ -64,20 +58,17 @@
 
           <form id="alarmForm" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Alarm Time -->
               <div>
                 <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Time</label>
                 <input type="time" id="alarmTime" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-lg focus:outline-none focus:border-amber-400 transition">
               </div>
 
-              <!-- Label/Goal -->
               <div>
                 <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Objective / Label</label>
                 <input type="text" id="alarmLabel" placeholder="e.g. Q3 Sales Goal Review" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400 transition">
               </div>
             </div>
 
-            <!-- Audio Choice Mode -->
             <div>
               <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Audio Source</label>
               <select id="audioSourceType" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-400 transition">
@@ -86,13 +77,12 @@
                   <option value="preset-2">Unstoppable Discipline & Focus</option>
                   <option value="preset-3">Executive Wealth & Business Growth</option>
                 </optgroup>
-                <optgroup label="Your Voice Recordings" id="recordingsOptGroup">
-                  <!-- Custom recordings will populate here -->
+                <optgroup label="Your Saved Voice Recordings" id="recordingsOptGroup">
+                  <!-- Custom recordings populate here -->
                 </optgroup>
               </select>
             </div>
 
-            <!-- Action Button -->
             <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-lg shadow-md hover:brightness-110 active:scale-[0.99] transition flex items-center justify-center space-x-2">
               <i class="fa-solid fa-bell"></i>
               <span>Activate Alarm</span>
@@ -100,7 +90,6 @@
           </form>
         </div>
 
-        <!-- Active Alarms List -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
           <h2 class="text-lg font-semibold text-slate-200 mb-4 flex items-center justify-between">
             <span class="flex items-center space-x-2">
@@ -120,76 +109,49 @@
 
       </div>
 
-      <!-- Column 2: Voice Recording Studio & Presets -->
+      <!-- Column 2: Voice Studio & Saved Library -->
       <div class="space-y-6">
 
-        <!-- Personal Recording Studio -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl flex flex-col justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-200 mb-1 flex items-center space-x-2">
-              <i class="fa-solid fa-microphone text-amber-400"></i>
-              <span>Voice Recorder Studio</span>
-            </h2>
-            <p class="text-xs text-slate-400 mb-4">Record your own voice statement or executive directive.</p>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
+          <h2 class="text-lg font-semibold text-slate-200 mb-1 flex items-center space-x-2">
+            <i class="fa-solid fa-microphone text-amber-400"></i>
+            <span>Voice Recorder Studio</span>
+          </h2>
+          <p class="text-xs text-slate-400 mb-4">Record your voice directive or target declaration.</p>
 
-            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-3">
-              <div id="recordTimer" class="font-mono text-2xl text-slate-400">00:00</div>
-              
-              <!-- Microphone Controls -->
-              <div class="flex justify-center items-center space-x-3">
-                <button id="recordBtn" class="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition active:scale-95">
-                  <i class="fa-solid fa-microphone text-lg"></i>
-                </button>
-                <button id="stopRecordBtn" disabled class="w-12 h-12 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center transition cursor-not-allowed">
-                  <i class="fa-solid fa-square text-lg"></i>
-                </button>
-              </div>
-
-              <div id="recordingStatus" class="text-xs text-slate-500 italic">Click mic to start recording custom audio</div>
-            </div>
-
-            <!-- Preview & Save Form -->
-            <div id="recordingSaveContainer" class="hidden mt-4 space-y-3 border-t border-slate-800 pt-4">
-              <audio id="audioPreview" controls class="w-full h-8 rounded-lg bg-slate-950"></audio>
-              <input type="text" id="recordingTitle" placeholder="Voice Memo Title (e.g., Morning Focus)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
-              <button id="saveRecordingBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-medium py-2 rounded-lg text-sm transition">
-                Save Recording to Library
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-3">
+            <div id="recordTimer" class="font-mono text-2xl text-slate-400">00:00</div>
+            
+            <div class="flex justify-center items-center space-x-3">
+              <button id="recordBtn" class="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition active:scale-95">
+                <i class="fa-solid fa-microphone text-lg"></i>
+              </button>
+              <button id="stopRecordBtn" disabled class="w-12 h-12 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center transition cursor-not-allowed">
+                <i class="fa-solid fa-square text-lg"></i>
               </button>
             </div>
+
+            <div id="recordingStatus" class="text-xs text-slate-500 italic">Click mic to start recording</div>
+          </div>
+
+          <div id="recordingSaveContainer" class="hidden mt-4 space-y-3 border-t border-slate-800 pt-4">
+            <audio id="audioPreview" controls class="w-full h-8 rounded-lg bg-slate-950"></audio>
+            <input type="text" id="recordingTitle" placeholder="Memo Title (e.g., Morning Focus Goal)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
+            <button id="saveRecordingBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 font-medium py-2 rounded-lg text-sm transition">
+              Save Recording to Library
+            </button>
           </div>
         </div>
 
-        <!-- Curated Motivational Library Preview -->
+        <!-- Saved Voice Library Display -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
           <h2 class="text-lg font-semibold text-slate-200 mb-3 flex items-center space-x-2">
-            <i class="fa-solid fa-gem text-amber-400"></i>
-            <span>Executive Motivational Audio</span>
+            <i class="fa-solid fa-folder-open text-amber-400"></i>
+            <span>Your Saved Voice Recordings</span>
           </h2>
           
-          <div class="space-y-3">
-            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div>
-                <div class="text-sm font-medium text-slate-200">Morning Victory</div>
-                <div class="text-xs text-slate-500">Focus on immediate momentum and execution</div>
-              </div>
-              <button onclick="previewPreset(1)" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            </div>
-
-            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div>
-                <div class="text-sm font-medium text-slate-200">Unstoppable Discipline</div>
-                <div class="text-xs text-slate-500">Refusal to compromise on key standards</div>
-              </div>
-              <button onclick="previewPreset(2)" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            </div>
-
-            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div>
-                <div class="text-sm font-medium text-slate-200">Wealth & Business Growth</div>
-                <div class="text-xs text-slate-500">Value creation and high-stakes problem solving</div>
-              </div>
-              <button onclick="previewPreset(3)" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            </div>
+          <div id="savedRecordingsList" class="space-y-3">
+            <!-- Dynamically populated -->
           </div>
         </div>
 
@@ -197,14 +159,13 @@
 
     </div>
 
-    <!-- Footer -->
     <footer class="border-t border-slate-800 pt-4 text-center text-xs text-slate-500">
       &copy; MindsetAlarm System &bull; High Performance Tools for Business & Life Success
     </footer>
 
   </div>
 
-  <!-- Full-Screen Triggered Alarm Overlay Modal -->
+  <!-- Triggered Alarm Modal -->
   <div id="alarmModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 hidden flex-col items-center justify-center p-6 text-center">
     <div class="absolute w-72 h-72 rounded-full gold-gradient opacity-20 blur-3xl animate-pulse-ring"></div>
     
@@ -224,7 +185,7 @@
           <i class="fa-solid fa-volume-high"></i>
           <span>PLAYING DIRECTIVE AUDIO</span>
         </div>
-        <div id="modalAudioTitle" class="text-sm font-medium text-slate-300 italic">"Morning Victory Statement"</div>
+        <div id="modalAudioTitle" class="text-sm font-medium text-slate-300 italic">"Playing Directive"</div>
       </div>
 
       <div class="flex flex-col space-y-3 pt-2">
@@ -238,13 +199,13 @@
     </div>
   </div>
 
-  <!-- Application Logic -->
   <script>
-    // App State Management
+    // App State
     let alarms = JSON.parse(localStorage.getItem('mindset_alarms') || '[]');
-    let customAudioList = JSON.parse(localStorage.getItem('mindset_audio') || '[]');
+    let customAudioList = [];
     let activeTriggeredAlarm = null;
     let currentPlayingAudio = null;
+    let db;
 
     // Media Recorder Variables
     let mediaRecorder;
@@ -253,7 +214,6 @@
     let recordSeconds = 0;
     let currentRecordedBlob = null;
 
-    // Preset Motivational Texts for SpeechSynthesis Backup/Presets
     const presetMessages = {
       'preset-1': "Good morning champion. Today is another opportunity to build your empire. Execute your plans without hesitation, maintain high energy, and win the day.",
       'preset-2': "Discipline equals freedom. Focus completely on high-value priority objectives. Do not get distracted by non-essentials. Stay resilient and relentless.",
@@ -267,6 +227,7 @@
     const alarmCountBadge = document.getElementById('alarmCountBadge');
     const audioSourceTypeSelect = document.getElementById('audioSourceType');
     const recordingsOptGroup = document.getElementById('recordingsOptGroup');
+    const savedRecordingsList = document.getElementById('savedRecordingsList');
 
     const recordBtn = document.getElementById('recordBtn');
     const stopRecordBtn = document.getElementById('stopRecordBtn');
@@ -284,31 +245,82 @@
     const dismissBtn = document.getElementById('dismissBtn');
     const snoozeBtn = document.getElementById('snoozeBtn');
 
-    // Initialize App
-    function init() {
+    // IndexedDB Setup for Unlimited Audio File Storage
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('MindsetAlarmAudioDB', 1);
+        request.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains('recordings')) {
+            database.createObjectStore('recordings', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve(db);
+        };
+        request.onerror = (e) => reject(e);
+      });
+    }
+
+    async function loadRecordingsFromDB() {
+      if (!db) return;
+      const tx = db.transaction('recordings', 'readonly');
+      const store = tx.objectStore('recordings');
+      const req = store.getAll();
+      req.onsuccess = () => {
+        customAudioList = req.result || [];
+        renderCustomAudioOptions();
+        renderSavedRecordingsList();
+      };
+    }
+
+    async function saveRecordingToDB(recording) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('recordings', 'readwrite');
+        const store = tx.objectStore('recordings');
+        const req = store.put(recording);
+        req.onsuccess = () => resolve();
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    async function deleteRecordingFromDB(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('recordings', 'readwrite');
+        const store = tx.objectStore('recordings');
+        const req = store.delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    // App Initialization
+    async function init() {
       updateClock();
       setInterval(updateClock, 1000);
-      renderCustomAudioOptions();
+      try {
+        await initDB();
+        await loadRecordingsFromDB();
+      } catch(e) {
+        console.error("Database initialization failed:", e);
+      }
       renderAlarms();
       setupRecorder();
-      
-      // Check alarms every second
       setInterval(checkAlarms, 1000);
     }
 
-    // Live Clock Update
     function updateClock() {
       const now = new Date();
       liveClockEl.textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
-    // Render Custom Audio Options into Dropdown
     function renderCustomAudioOptions() {
       recordingsOptGroup.innerHTML = '';
       if (customAudioList.length === 0) {
         const opt = document.createElement('option');
         opt.disabled = true;
-        opt.textContent = '(No custom voice recordings yet)';
+        opt.textContent = '(No saved voice recordings yet)';
         recordingsOptGroup.appendChild(opt);
       } else {
         customAudioList.forEach(item => {
@@ -320,7 +332,49 @@
       }
     }
 
-    // Render Alarms List UI
+    function renderSavedRecordingsList() {
+      savedRecordingsList.innerHTML = '';
+      if (customAudioList.length === 0) {
+        savedRecordingsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 border border-dashed border-slate-800 rounded-xl text-xs">
+            No recordings saved yet. Record a voice memo above to build your list.
+          </div>`;
+        return;
+      }
+
+      customAudioList.forEach(rec => {
+        const item = document.createElement('div');
+        item.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between";
+        item.innerHTML = `
+          <div>
+            <div class="text-sm font-medium text-slate-200">🎙️ ${rec.title}</div>
+            <div class="text-xs text-slate-500">${rec.date || 'Saved Voice Recording'}</div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="playSavedAudio('${rec.id}')" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
+            <button onclick="deleteSavedAudio('${rec.id}')" class="text-slate-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
+          </div>
+        `;
+        savedRecordingsList.appendChild(item);
+      });
+    }
+
+    window.playSavedAudio = function(id) {
+      const rec = customAudioList.find(r => r.id === id);
+      if (rec) {
+        if (currentPlayingAudio) currentPlayingAudio.pause();
+        const blob = new Blob([rec.blobData], { type: rec.mimeType || 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        currentPlayingAudio = new Audio(url);
+        currentPlayingAudio.play();
+      }
+    };
+
+    window.deleteSavedAudio = async function(id) {
+      await deleteRecordingFromDB(id);
+      await loadRecordingsFromDB();
+    };
+
     function renderAlarms() {
       alarmCountBadge.textContent = `${alarms.length} Active`;
       if (alarms.length === 0) {
@@ -337,7 +391,7 @@
         const item = document.createElement('div');
         item.className = "bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between";
         
-        let audioLabel = "Preset Motivational Track";
+        let audioLabel = "Preset Track";
         if (alarm.audioSource.startsWith('preset-1')) audioLabel = "Morning Victory";
         else if (alarm.audioSource.startsWith('preset-2')) audioLabel = "Unstoppable Discipline";
         else if (alarm.audioSource.startsWith('preset-3')) audioLabel = "Wealth & Growth";
@@ -362,7 +416,6 @@
       });
     }
 
-    // Helper: Convert "HH:MM" to "HH:MM AM/PM"
     function format12Hour(timeStr) {
       const [h, m] = timeStr.split(':');
       let hour = parseInt(h, 10);
@@ -371,7 +424,6 @@
       return `${hour.toString().padStart(2, '0')}:${m} ${ampm}`;
     }
 
-    // Add Alarm Form Event
     alarmForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const timeVal = document.getElementById('alarmTime').value;
@@ -388,22 +440,18 @@
       alarms.push(newAlarm);
       localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
       renderAlarms();
-
-      // Reset form label
       document.getElementById('alarmLabel').value = '';
     });
 
-    // Delete Alarm
     window.deleteAlarm = function(id) {
       alarms = alarms.filter(a => a.id !== id);
       localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
       renderAlarms();
     };
 
-    // Recorder Functionality Setup
     function setupRecorder() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        recordingStatus.textContent = "Audio recording not supported in this browser.";
+        recordingStatus.textContent = "Microphone recording not supported on this browser.";
         recordBtn.disabled = true;
         return;
       }
@@ -411,7 +459,12 @@
       recordBtn.addEventListener('click', async () => {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
+          
+          let mimeType = 'audio/webm';
+          if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+          else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
+
+          mediaRecorder = new MediaRecorder(stream, { mimeType });
           audioChunks = [];
 
           mediaRecorder.ondataavailable = (e) => {
@@ -419,7 +472,7 @@
           };
 
           mediaRecorder.onstop = () => {
-            currentRecordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            currentRecordedBlob = new Blob(audioChunks, { type: mimeType });
             const audioUrl = URL.createObjectURL(currentRecordedBlob);
             audioPreview.src = audioUrl;
             recordingSaveContainer.classList.remove('hidden');
@@ -432,7 +485,7 @@
           stopRecordBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
           stopRecordBtn.classList.add('bg-slate-700', 'text-amber-400', 'hover:bg-slate-600');
 
-          recordingStatus.textContent = "Recording voice memo...";
+          recordingStatus.textContent = "Recording in progress...";
           recordSeconds = 0;
           recordTimer.textContent = "00:00";
           recordTimer.classList.add('text-red-500');
@@ -445,7 +498,8 @@
           }, 1000);
 
         } catch (err) {
-          alert('Microphone access denied or error: ' + err.message);
+          recordingStatus.textContent = "Error: Microphone permission denied.";
+          alert("Microphone permission error: " + err.message);
         }
       });
 
@@ -463,43 +517,32 @@
         }
       });
 
-      saveRecordingBtn.addEventListener('click', () => {
-        const title = recordingTitleInput.value.trim() || 'Custom Directive ' + (customAudioList.length + 1);
+      saveRecordingBtn.addEventListener('click', async () => {
+        if (!currentRecordedBlob) return;
+        const title = recordingTitleInput.value.trim() || 'Custom Voice Directive ' + (customAudioList.length + 1);
         
-        // Convert Blob to Base64 for LocalStorage Persistence
-        const reader = new FileReader();
-        reader.readAsDataURL(currentRecordedBlob);
-        reader.onloadend = () => {
-          const base64Data = reader.result;
-          const newRecording = {
-            id: 'rec_' + Date.now(),
-            title: title,
-            audioData: base64Data
-          };
+        const recording = {
+          id: 'rec_' + Date.now(),
+          title: title,
+          blobData: currentRecordedBlob,
+          mimeType: currentRecordedBlob.type,
+          date: new Date().toLocaleDateString()
+        };
 
-          customAudioList.push(newRecording);
-          localStorage.setItem('mindset_audio', JSON.stringify(customAudioList));
-          renderCustomAudioOptions();
+        try {
+          await saveRecordingToDB(recording);
+          await loadRecordingsFromDB();
           
-          // Reset Recorder UI
           recordingSaveContainer.classList.add('hidden');
           recordingTitleInput.value = '';
-          recordingStatus.textContent = "Saved successfully to library!";
-        };
+          recordingStatus.textContent = "Recording saved to library successfully!";
+        } catch(e) {
+          recordingStatus.textContent = "Error saving recording to storage.";
+          console.error(e);
+        }
       });
     }
 
-    // Preview Curated Audio
-    window.previewPreset = function(num) {
-      window.speechSynthesis.cancel();
-      const text = presetMessages[`preset-${num}`];
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    };
-
-    // Alarm Monitor Loop
     function checkAlarms() {
       const now = new Date();
       const currentHours = now.getHours().toString().padStart(2, '0');
@@ -507,7 +550,6 @@
       const currentTimeStr = `${currentHours}:${currentMinutes}`;
       const seconds = now.getSeconds();
 
-      // Trigger precisely at top of the minute (seconds === 0)
       if (seconds === 0) {
         alarms.forEach(alarm => {
           if (alarm.time === currentTimeStr && !activeTriggeredAlarm) {
@@ -517,7 +559,6 @@
       }
     }
 
-    // Trigger Alarm & Play Audio
     function triggerAlarm(alarm) {
       activeTriggeredAlarm = alarm;
       modalAlarmTime.textContent = format12Hour(alarm.time);
@@ -526,7 +567,6 @@
       alarmModal.classList.remove('hidden');
       alarmModal.classList.add('flex');
 
-      // Play designated audio
       if (alarm.audioSource.startsWith('preset-')) {
         const text = presetMessages[alarm.audioSource];
         modalAudioTitle.textContent = text;
@@ -539,16 +579,17 @@
         const customRec = customAudioList.find(r => r.id === alarm.audioSource);
         if (customRec) {
           modalAudioTitle.textContent = `"${customRec.title}"`;
-          currentPlayingAudio = new Audio(customRec.audioData);
+          const blob = new Blob([customRec.blobData], { type: customRec.mimeType || 'audio/webm' });
+          const url = URL.createObjectURL(blob);
+          currentPlayingAudio = new Audio(url);
           currentPlayingAudio.play();
         } else {
-          modalAudioTitle.textContent = "Motivational Audio Directive";
+          modalAudioTitle.textContent = "Motivational Directive";
           window.speechSynthesis.speak(new SpeechSynthesisUtterance("Time to execute your tasks and reach your target."));
         }
       }
     }
 
-    // Dismiss & Snooze Event Listeners
     dismissBtn.addEventListener('click', () => {
       window.speechSynthesis.cancel();
       if (currentPlayingAudio) {
@@ -567,7 +608,6 @@
         currentPlayingAudio = null;
       }
 
-      // Schedule Snooze Alarm +5 minutes
       if (activeTriggeredAlarm) {
         const now = new Date();
         now.setMinutes(now.getMinutes() + 5);
@@ -591,7 +631,6 @@
       activeTriggeredAlarm = null;
     });
 
-    // Start App
     init();
   </script>
 </body>
