@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindsetAlarm - Executive Success Alarms & Voice Reminders</title>
+  <title>MindsetAlarm - Executive Success Alarms & Custom Voice Reminders</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -29,7 +29,7 @@
 
   <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-6">
 
-    <!-- Top Navigation -->
+    <!-- Header Navigation -->
     <header class="flex items-center justify-between border-b border-slate-800 pb-4">
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/10">
@@ -72,15 +72,30 @@
             <div>
               <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Audio Source</label>
               <select id="audioSourceType" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-400 transition">
-                <optgroup label="Curated Motivational Messages (Female AI Voice)">
-                  <option value="preset-1">Morning Victory & High Power Execution</option>
-                  <option value="preset-2">Unstoppable Discipline & Focus</option>
-                  <option value="preset-3">Executive Wealth & Business Growth</option>
-                </optgroup>
+                <option value="custom-speech">🗣️ Custom AI Voice Message (Set Below)</option>
                 <optgroup label="Your Saved Voice Recordings" id="recordingsOptGroup">
                   <!-- Custom recordings populate here -->
                 </optgroup>
               </select>
+            </div>
+
+            <!-- Custom Speech Script Box -->
+            <div id="customSpeechContainer" class="space-y-2 bg-slate-950 p-4 border border-slate-800 rounded-xl">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs uppercase tracking-wider text-amber-400 font-semibold">Custom Voice Message Script</label>
+                <div class="space-x-1">
+                  <button type="button" onclick="loadTemplate(1)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Morning Victory</button>
+                  <button type="button" onclick="loadTemplate(2)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Sales Target</button>
+                  <button type="button" onclick="loadTemplate(3)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Focus & Discipline</button>
+                </div>
+              </div>
+              <textarea id="customSpeechText" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-400 placeholder-slate-600" placeholder="Type the exact motivational message you want spoken when this alarm triggers..."></textarea>
+              <div class="flex justify-end">
+                <button type="button" onclick="previewCurrentCustomMessage()" class="text-xs text-amber-400 hover:text-amber-300 flex items-center space-x-1">
+                  <i class="fa-solid fa-volume-high"></i>
+                  <span>Test Speak Message</span>
+                </button>
+              </div>
             </div>
 
             <button type="submit" class="w-full gold-gradient text-slate-950 font-bold py-3 rounded-lg shadow-md hover:brightness-110 active:scale-[0.99] transition flex items-center justify-center space-x-2">
@@ -109,28 +124,46 @@
 
       </div>
 
-      <!-- Column 2: Voice Studio, Voice Settings & Library -->
+      <!-- Column 2: Voice Studio, Voice Selector & Saved Library -->
       <div class="space-y-6">
 
-        <!-- Voice Selection Setting -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
-          <h2 class="text-lg font-semibold text-slate-200 mb-2 flex items-center space-x-2">
-            <i class="fa-solid fa-user-nurse text-amber-400"></i>
-            <span>Motivational Female Voice</span>
+        <!-- Male & Female AI Voice Selector Panel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
+          <h2 class="text-lg font-semibold text-slate-200 flex items-center space-x-2">
+            <i class="fa-solid fa-user-gear text-amber-400"></i>
+            <span>AI Voice Settings (Male & Female)</span>
           </h2>
-          <label class="block text-xs text-slate-400 mb-2">Select your preferred realistic female voice:</label>
-          <select id="femaleVoiceSelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
-            <option value="">Loading high-quality female voices...</option>
-          </select>
+
+          <!-- Gender Category Tabs -->
+          <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-lg border border-slate-800">
+            <button id="tabFemale" onclick="setGenderFilter('female')" class="py-1.5 text-xs font-semibold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              <i class="fa-solid fa-venus mr-1"></i> Female Voices
+            </button>
+            <button id="tabMale" onclick="setGenderFilter('male')" class="py-1.5 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200">
+              <i class="fa-solid fa-mars mr-1"></i> Male Voices
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">Selected Voice Model:</label>
+            <select id="voiceSelectDropdown" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
+              <option value="">Detecting device voice engine...</option>
+            </select>
+          </div>
+
+          <button onclick="testSelectedVoice()" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-circle-play"></i>
+            <span>Test Selected Voice</span>
+          </button>
         </div>
 
         <!-- Voice Recorder Studio -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
           <h2 class="text-lg font-semibold text-slate-200 mb-1 flex items-center space-x-2">
             <i class="fa-solid fa-microphone text-amber-400"></i>
-            <span>Voice Recorder Studio</span>
+            <span>Personal Voice Studio</span>
           </h2>
-          <p class="text-xs text-slate-400 mb-4">Record your own voice statement or executive directive.</p>
+          <p class="text-xs text-slate-400 mb-4">Record your own spoken voice directive.</p>
 
           <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-3">
             <div id="recordTimer" class="font-mono text-2xl text-slate-400">00:00</div>
@@ -156,41 +189,7 @@
           </div>
         </div>
 
-        <!-- Curated Motivational Audio Presets -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
-          <h2 class="text-lg font-semibold text-slate-200 mb-3 flex items-center space-x-2">
-            <i class="fa-solid fa-gem text-amber-400"></i>
-            <span>Curated Motivational Messages</span>
-          </h2>
-          
-          <div class="space-y-3">
-            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div>
-                <div class="text-sm font-medium text-slate-200">Morning Victory</div>
-                <div class="text-xs text-slate-500">Focus on immediate momentum & execution</div>
-              </div>
-              <button onclick="previewPreset(1)" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            </div>
-
-            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div>
-                <div class="text-sm font-medium text-slate-200">Unstoppable Discipline</div>
-                <div class="text-xs text-slate-500">Refusal to compromise on key standards</div>
-              </div>
-              <button onclick="previewPreset(2)" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            </div>
-
-            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div>
-                <div class="text-sm font-medium text-slate-200">Wealth & Business Growth</div>
-                <div class="text-xs text-slate-500">Value creation & high-stakes problem solving</div>
-              </div>
-              <button onclick="previewPreset(3)" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Saved Personal Recordings List -->
+        <!-- Saved Personal Voice Recordings List -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
           <h2 class="text-lg font-semibold text-slate-200 mb-3 flex items-center space-x-2">
             <i class="fa-solid fa-folder-open text-amber-400"></i>
@@ -250,8 +249,9 @@
     // App State
     let alarms = JSON.parse(localStorage.getItem('mindset_alarms') || '[]');
     let customAudioList = [];
-    let availableVoices = [];
-    let selectedFemaleVoice = null;
+    let allSystemVoices = [];
+    let currentGenderFilter = 'female';
+    let selectedVoice = null;
     let activeTriggeredAlarm = null;
     let currentPlayingAudio = null;
     let db;
@@ -263,10 +263,10 @@
     let recordSeconds = 0;
     let currentRecordedBlob = null;
 
-    const presetMessages = {
-      'preset-1': "Good morning champion. Today is another opportunity to build your empire. Execute your plans without hesitation, maintain high energy, and win the day.",
-      'preset-2': "Discipline equals freedom. Focus completely on high-value priority objectives. Do not get distracted by non-essentials. Stay resilient and relentless.",
-      'preset-3': "Focus on creating extreme value. Solve complex challenges, lead with clarity, and remain focused on long-term compound growth."
+    const templates = {
+      1: "Good morning champion. Today is another opportunity to build your empire. Execute your plans without hesitation, maintain high energy, and win the day.",
+      2: "Time for revenue generation. Review key targets, deliver extreme value, and close out major priorities with focus.",
+      3: "Discipline equals freedom. Maintain extreme focus on primary business objectives. Eliminate distractions and conquer the task."
     };
 
     // DOM Elements
@@ -277,7 +277,12 @@
     const audioSourceTypeSelect = document.getElementById('audioSourceType');
     const recordingsOptGroup = document.getElementById('recordingsOptGroup');
     const savedRecordingsList = document.getElementById('savedRecordingsList');
-    const femaleVoiceSelect = document.getElementById('femaleVoiceSelect');
+    const voiceSelectDropdown = document.getElementById('voiceSelectDropdown');
+    const customSpeechText = document.getElementById('customSpeechText');
+    const customSpeechContainer = document.getElementById('customSpeechContainer');
+
+    const tabFemale = document.getElementById('tabFemale');
+    const tabMale = document.getElementById('tabMale');
 
     const recordBtn = document.getElementById('recordBtn');
     const stopRecordBtn = document.getElementById('stopRecordBtn');
@@ -295,7 +300,10 @@
     const dismissBtn = document.getElementById('dismissBtn');
     const snoozeBtn = document.getElementById('snoozeBtn');
 
-    // IndexedDB Setup for Unlimited Audio File Storage
+    // Default template on load
+    customSpeechText.value = templates[1];
+
+    // IndexedDB Setup for Audio Files
     function initDB() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open('MindsetAlarmAudioDB', 1);
@@ -345,43 +353,80 @@
       });
     }
 
-    // Voice Engine: Detect and filter realistic female voices
-    function populateFemaleVoices() {
-      if ('speechSynthesis' in window) {
-        availableVoices = window.speechSynthesis.getVoices();
-        femaleVoiceSelect.innerHTML = '';
+    // Advanced Voice Selection: Female & Male Voice Scanner
+    function loadAndFilterVoices() {
+      if (!('speechSynthesis' in window)) return;
+      allSystemVoices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
 
-        // English female voices priority matchers
-        const femaleKeywords = ['female', 'samantha', 'victoria', 'zira', 'jennie', 'aria', 'jenny', 'karen', 'sora', 'ava', 'emma', 'google us english'];
-        let femaleVoices = availableVoices.filter(v => 
-          v.lang.startsWith('en') && femaleKeywords.some(kw => v.name.toLowerCase().includes(kw))
-        );
+      const maleKeywords = ['male', 'david', 'mark', 'george', 'guy', 'alex', 'daniel', 'fred', 'oliver', 'ryan', 'james'];
+      const femaleKeywords = ['female', 'samantha', 'victoria', 'zira', 'jenny', 'jennie', 'aria', 'karen', 'ava', 'emma', 'sora'];
 
-        if (femaleVoices.length === 0) {
-          femaleVoices = availableVoices.filter(v => v.lang.startsWith('en'));
-        }
+      let filtered = [];
+      if (currentGenderFilter === 'male') {
+        filtered = allSystemVoices.filter(v => maleKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+        if (filtered.length === 0) filtered = allSystemVoices; // Fallback
+      } else {
+        filtered = allSystemVoices.filter(v => femaleKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+        if (filtered.length === 0) filtered = allSystemVoices; // Fallback
+      }
 
-        femaleVoices.forEach((voice, index) => {
-          const option = document.createElement('option');
-          option.value = voice.name;
-          option.textContent = `${voice.name} (${voice.lang})`;
-          if (index === 0) option.selected = true;
-          femaleVoiceSelect.appendChild(option);
-        });
+      voiceSelectDropdown.innerHTML = '';
+      filtered.forEach((v, idx) => {
+        const opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = `${v.name} (${v.lang})`;
+        if (idx === 0) opt.selected = true;
+        voiceSelectDropdown.appendChild(opt);
+      });
 
-        if (femaleVoices.length > 0) {
-          selectedFemaleVoice = femaleVoices[0];
-        }
+      if (filtered.length > 0) {
+        selectedVoice = filtered[0];
       }
     }
 
-    femaleVoiceSelect.addEventListener('change', (e) => {
-      selectedFemaleVoice = availableVoices.find(v => v.name === e.target.value);
+    function setGenderFilter(gender) {
+      currentGenderFilter = gender;
+      if (gender === 'female') {
+        tabFemale.className = "py-1.5 text-xs font-semibold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        tabMale.className = "py-1.5 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200";
+      } else {
+        tabMale.className = "py-1.5 text-xs font-semibold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        tabFemale.className = "py-1.5 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200";
+      }
+      loadAndFilterVoices();
+    }
+
+    voiceSelectDropdown.addEventListener('change', (e) => {
+      selectedVoice = allSystemVoices.find(v => v.name === e.target.value);
     });
 
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = populateFemaleVoices;
-      populateFemaleVoices();
+      window.speechSynthesis.onvoiceschanged = loadAndFilterVoices;
+      loadAndFilterVoices();
+    }
+
+    function testSelectedVoice() {
+      speakText("Hello executive. Voice engine test successful. Ready to drive performance.");
+    }
+
+    function previewCurrentCustomMessage() {
+      const msg = customSpeechText.value.trim() || "Please enter a message to speak.";
+      speakText(msg);
+    }
+
+    function loadTemplate(num) {
+      customSpeechText.value = templates[num];
+    }
+
+    function speakText(text) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+      utterance.rate = 0.95;
+      utterance.pitch = currentGenderFilter === 'male' ? 0.95 : 1.05;
+      window.speechSynthesis.speak(utterance);
     }
 
     // App Initialization
@@ -403,6 +448,14 @@
       const now = new Date();
       liveClockEl.textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
+
+    audioSourceTypeSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'custom-speech') {
+        customSpeechContainer.classList.remove('hidden');
+      } else {
+        customSpeechContainer.classList.add('hidden');
+      }
+    });
 
     function renderCustomAudioOptions() {
       recordingsOptGroup.innerHTML = '';
@@ -464,22 +517,6 @@
       await loadRecordingsFromDB();
     };
 
-    window.previewPreset = function(num) {
-      window.speechSynthesis.cancel();
-      const text = presetMessages[`preset-${num}`];
-      speakWithFemaleVoice(text);
-    };
-
-    function speakWithFemaleVoice(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      if (selectedFemaleVoice) {
-        utterance.voice = selectedFemaleVoice;
-      }
-      utterance.rate = 0.95;  // Slightly lower rate for clarity
-      utterance.pitch = 1.05; // Humanistic warm pitch tuning
-      window.speechSynthesis.speak(utterance);
-    }
-
     function renderAlarms() {
       alarmCountBadge.textContent = `${alarms.length} Active`;
       if (alarms.length === 0) {
@@ -496,11 +533,8 @@
         const item = document.createElement('div');
         item.className = "bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between";
         
-        let audioLabel = "Preset Track";
-        if (alarm.audioSource.startsWith('preset-1')) audioLabel = "Morning Victory";
-        else if (alarm.audioSource.startsWith('preset-2')) audioLabel = "Unstoppable Discipline";
-        else if (alarm.audioSource.startsWith('preset-3')) audioLabel = "Wealth & Growth";
-        else {
+        let audioLabel = "Custom AI Speech Message";
+        if (alarm.audioSource !== 'custom-speech') {
           const rec = customAudioList.find(r => r.id === alarm.audioSource);
           if (rec) audioLabel = `🎙️ ${rec.title}`;
         }
@@ -534,12 +568,14 @@
       const timeVal = document.getElementById('alarmTime').value;
       const labelVal = document.getElementById('alarmLabel').value;
       const sourceVal = audioSourceTypeSelect.value;
+      const messageTextVal = customSpeechText.value;
 
       const newAlarm = {
         id: 'alarm_' + Date.now(),
         time: timeVal,
         label: labelVal,
-        audioSource: sourceVal
+        audioSource: sourceVal,
+        customText: messageTextVal
       };
 
       alarms.push(newAlarm);
@@ -672,10 +708,10 @@
       alarmModal.classList.remove('hidden');
       alarmModal.classList.add('flex');
 
-      if (alarm.audioSource.startsWith('preset-')) {
-        const text = presetMessages[alarm.audioSource];
+      if (alarm.audioSource === 'custom-speech') {
+        const text = alarm.customText || "Time to take action and achieve your goal.";
         modalAudioTitle.textContent = `"${text}"`;
-        speakWithFemaleVoice(text);
+        speakText(text);
       } else {
         const customRec = customAudioList.find(r => r.id === alarm.audioSource);
         if (customRec) {
@@ -686,7 +722,7 @@
           currentPlayingAudio.play();
         } else {
           modalAudioTitle.textContent = "Motivational Directive";
-          speakWithFemaleVoice("Time to execute your tasks and reach your target.");
+          speakText("Time to execute your tasks and reach your target.");
         }
       }
     }
@@ -719,7 +755,8 @@
           id: 'snooze_' + Date.now(),
           time: `${snoozeHours}:${snoozeMins}`,
           label: `[SNOOZE] ${activeTriggeredAlarm.label}`,
-          audioSource: activeTriggeredAlarm.audioSource
+          audioSource: activeTriggeredAlarm.audioSource,
+          customText: activeTriggeredAlarm.customText
         };
 
         alarms.push(snoozeAlarm);
