@@ -63,16 +63,18 @@
           <form id="alarmForm" class="space-y-4" novalidate>
             <div>
               <div class="flex justify-between items-center mb-1">
-                <label class="block text-xs uppercase tracking-wider text-slate-400">Date & Time</label>
+                <label class="block text-xs uppercase tracking-wider text-slate-400">Date & Time (Pick Exact Minute or Use Quick Buttons)</label>
                 <!-- Quick Preset Buttons -->
                 <div class="space-x-1">
+                  <button type="button" onclick="setQuickTime(4)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+4 Mins</button>
                   <button type="button" onclick="setQuickTime(15)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+15 Mins</button>
                   <button type="button" onclick="setQuickTime(30)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+30 Mins</button>
                   <button type="button" onclick="setQuickTime(60)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+1 Hour</button>
                   <button type="button" onclick="setTomorrowMorning()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Tomorrow AM</button>
                 </div>
               </div>
-              <input type="datetime-local" id="alarmTime" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-base focus:outline-none focus:border-amber-400 transition">
+              <!-- step="60" enables 1-minute precise selection across browsers -->
+              <input type="datetime-local" id="alarmTime" step="60" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-base focus:outline-none focus:border-amber-400 transition">
             </div>
 
             <div>
@@ -500,7 +502,6 @@
     function loadAndFilterVoices() {
       if (!('speechSynthesis' in window)) return;
       
-      // Filter out Fred voice entirely
       allSystemVoices = window.speechSynthesis.getVoices()
         .filter(v => v.lang.startsWith('en') && v.name.toLowerCase() !== 'fred');
 
@@ -767,7 +768,7 @@
           return;
         }
 
-        if (selectedTimestamp < Date.now() - 60000) {
+        if (selectedTimestamp < Date.now() - 30000) {
           alert("Please select a date and time in the future.");
           return;
         }
