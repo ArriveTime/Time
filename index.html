@@ -294,11 +294,11 @@
     let audioCtx = null;
     let activeSoundNode = null;
 
-    // Realistic Recorded Sound URLs
+    // Realistic Recorded Sound URLs (Updated to universal MP3s for compatibility)
     const soundUrls = {
-      'sound-cat': 'https://actions.google.com/sounds/v1/animals/cat_meow.ogg',
+      'sound-cat': 'https://cdn.pixabay.com/download/audio/2022/03/24/audio_c8c8a73467.mp3',
       'sound-dog': 'https://actions.google.com/sounds/v1/animals/dog_barking.ogg',
-      'sound-birds': 'https://actions.google.com/sounds/v1/ambiences/outdoor_birds.ogg'
+      'sound-birds': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3'
     };
 
     // Media Recorder Variables
@@ -349,7 +349,7 @@
     const snoozeBtn = document.getElementById('snoozeBtn');
 
     // Default template on load
-    customSpeechText.value = templates[1];
+    if (customSpeechText) customSpeechText.value = templates[1];
 
     function getAudioContext() {
       if (!audioCtx) {
@@ -482,14 +482,16 @@
         if (filtered.length === 0) filtered = allSystemVoices;
       }
 
-      voiceSelectDropdown.innerHTML = '';
-      filtered.forEach((v, idx) => {
-        const opt = document.createElement('option');
-        opt.value = v.name;
-        opt.textContent = `${v.name} (${v.lang})`;
-        if (idx === 0) opt.selected = true;
-        voiceSelectDropdown.appendChild(opt);
-      });
+      if (voiceSelectDropdown) {
+        voiceSelectDropdown.innerHTML = '';
+        filtered.forEach((v, idx) => {
+          const opt = document.createElement('option');
+          opt.value = v.name;
+          opt.textContent = `${v.name} (${v.lang})`;
+          if (idx === 0) opt.selected = true;
+          voiceSelectDropdown.appendChild(opt);
+        });
+      }
 
       if (filtered.length > 0) {
         selectedVoice = filtered[0];
@@ -501,31 +503,33 @@
       stopSound();
 
       if (gender === 'female') {
-        tabFemale.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        tabMale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
-        tabNature.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
-        voiceDropdownContainer.classList.remove('hidden');
-        natureSoundsContainer.classList.add('hidden');
+        if (tabFemale) tabFemale.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        if (tabMale) tabMale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        if (tabNature) tabNature.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        if (voiceDropdownContainer) voiceDropdownContainer.classList.remove('hidden');
+        if (natureSoundsContainer) natureSoundsContainer.classList.add('hidden');
         loadAndFilterVoices();
       } else if (gender === 'male') {
-        tabMale.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        tabFemale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
-        tabNature.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
-        voiceDropdownContainer.classList.remove('hidden');
-        natureSoundsContainer.classList.add('hidden');
+        if (tabMale) tabMale.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        if (tabFemale) tabFemale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        if (tabNature) tabNature.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        if (voiceDropdownContainer) voiceDropdownContainer.classList.remove('hidden');
+        if (natureSoundsContainer) natureSoundsContainer.classList.add('hidden');
         loadAndFilterVoices();
       } else {
-        tabNature.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        tabFemale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
-        tabMale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
-        voiceDropdownContainer.classList.add('hidden');
-        natureSoundsContainer.classList.remove('hidden');
+        if (tabNature) tabNature.className = "py-1.5 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        if (tabFemale) tabFemale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        if (tabMale) tabMale.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+        if (voiceDropdownContainer) voiceDropdownContainer.classList.add('hidden');
+        if (natureSoundsContainer) natureSoundsContainer.classList.remove('hidden');
       }
     }
 
-    voiceSelectDropdown.addEventListener('change', (e) => {
-      selectedVoice = allSystemVoices.find(v => v.name === e.target.value);
-    });
+    if (voiceSelectDropdown) {
+      voiceSelectDropdown.addEventListener('change', (e) => {
+        selectedVoice = allSystemVoices.find(v => v.name === e.target.value);
+      });
+    }
 
     if ('speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = loadAndFilterVoices;
@@ -537,12 +541,12 @@
     }
 
     function previewCurrentCustomMessage() {
-      const msg = customSpeechText.value.trim() || "Please enter a message to speak.";
-      speakText(msg);
+      const msg = customSpeechText ? customSpeechText.value.trim() : "Please enter a message to speak.";
+      speakText(msg || "Please enter a message to speak.");
     }
 
     function loadTemplate(num) {
-      customSpeechText.value = templates[num];
+      if (customSpeechText) customSpeechText.value = templates[num];
     }
 
     function speakText(text) {
@@ -572,19 +576,24 @@
     }
 
     function updateClock() {
-      const now = new Date();
-      liveClockEl.textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      if (liveClockEl) {
+        const now = new Date();
+        liveClockEl.textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
     }
 
-    audioSourceTypeSelect.addEventListener('change', (e) => {
-      if (e.target.value === 'custom-speech') {
-        customSpeechContainer.classList.remove('hidden');
-      } else {
-        customSpeechContainer.classList.add('hidden');
-      }
-    });
+    if (audioSourceTypeSelect) {
+      audioSourceTypeSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'custom-speech') {
+          if (customSpeechContainer) customSpeechContainer.classList.remove('hidden');
+        } else {
+          if (customSpeechContainer) customSpeechContainer.classList.add('hidden');
+        }
+      });
+    }
 
     function renderCustomAudioOptions() {
+      if (!recordingsOptGroup) return;
       recordingsOptGroup.innerHTML = '';
       if (customAudioList.length === 0) {
         const opt = document.createElement('option');
@@ -602,6 +611,7 @@
     }
 
     function renderSavedRecordingsList() {
+      if (!savedRecordingsList) return;
       savedRecordingsList.innerHTML = '';
       if (customAudioList.length === 0) {
         savedRecordingsList.innerHTML = `
@@ -646,6 +656,7 @@
     };
 
     function renderAlarms() {
+      if (!alarmCountBadge || !alarmListEl) return;
       alarmCountBadge.textContent = `${alarms.length} Active`;
       if (alarms.length === 0) {
         alarmListEl.innerHTML = `
@@ -700,26 +711,28 @@
       return `${hour.toString().padStart(2, '0')}:${m} ${ampm}`;
     }
 
-    alarmForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const timeVal = document.getElementById('alarmTime').value;
-      const labelVal = document.getElementById('alarmLabel').value;
-      const sourceVal = audioSourceTypeSelect.value;
-      const messageTextVal = customSpeechText.value;
+    if (alarmForm) {
+      alarmForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const timeVal = document.getElementById('alarmTime').value;
+        const labelVal = document.getElementById('alarmLabel').value;
+        const sourceVal = audioSourceTypeSelect.value;
+        const messageTextVal = customSpeechText ? customSpeechText.value : '';
 
-      const newAlarm = {
-        id: 'alarm_' + Date.now(),
-        time: timeVal,
-        label: labelVal,
-        audioSource: sourceVal,
-        customText: messageTextVal
-      };
+        const newAlarm = {
+          id: 'alarm_' + Date.now(),
+          time: timeVal,
+          label: labelVal,
+          audioSource: sourceVal,
+          customText: messageTextVal
+        };
 
-      alarms.push(newAlarm);
-      localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
-      renderAlarms();
-      document.getElementById('alarmLabel').value = '';
-    });
+        alarms.push(newAlarm);
+        localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
+        renderAlarms();
+        document.getElementById('alarmLabel').value = '';
+      });
+    }
 
     window.deleteAlarm = function(id) {
       alarms = alarms.filter(a => a.id !== id);
@@ -729,96 +742,108 @@
 
     function setupRecorder() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        recordingStatus.textContent = "Microphone recording not supported on this browser.";
-        recordBtn.disabled = true;
+        if (recordingStatus) recordingStatus.textContent = "Microphone recording not supported on this browser.";
+        if (recordBtn) recordBtn.disabled = true;
         return;
       }
 
-      recordBtn.addEventListener('click', async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (recordBtn) {
+        recordBtn.addEventListener('click', async () => {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            let mimeType = 'audio/webm';
+            if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+            else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+              if (e.data.size > 0) audioChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+              currentRecordedBlob = new Blob(audioChunks, { type: mimeType });
+              const audioUrl = URL.createObjectURL(currentRecordedBlob);
+              if (audioPreview) audioPreview.src = audioUrl;
+              if (recordingSaveContainer) recordingSaveContainer.classList.remove('hidden');
+            };
+
+            mediaRecorder.start();
+            recordBtn.disabled = true;
+            recordBtn.classList.add('opacity-50');
+            if (stopRecordBtn) {
+              stopRecordBtn.disabled = false;
+              stopRecordBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
+              stopRecordBtn.classList.add('bg-slate-700', 'text-amber-400', 'hover:bg-slate-600');
+            }
+
+            if (recordingStatus) recordingStatus.textContent = "Recording in progress...";
+            recordSeconds = 0;
+            if (recordTimer) {
+              recordTimer.textContent = "00:00";
+              recordTimer.classList.add('text-red-500');
+            }
+
+            recordInterval = setInterval(() => {
+              recordSeconds++;
+              const m = Math.floor(recordSeconds / 60).toString().padStart(2, '0');
+              const s = (recordSeconds % 60).toString().padStart(2, '0');
+              if (recordTimer) recordTimer.textContent = `${m}:${s}`;
+            }, 1000);
+
+          } catch (err) {
+            if (recordingStatus) recordingStatus.textContent = "Error: Microphone permission denied.";
+            alert("Microphone permission error: " + err.message);
+          }
+        });
+      }
+
+      if (stopRecordBtn) {
+        stopRecordBtn.addEventListener('click', () => {
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            clearInterval(recordInterval);
+            if (recordBtn) {
+              recordBtn.disabled = false;
+              recordBtn.classList.remove('opacity-50');
+            }
+            stopRecordBtn.disabled = true;
+            stopRecordBtn.classList.add('text-slate-500', 'cursor-not-allowed');
+            if (recordTimer) recordTimer.classList.remove('text-red-500');
+            if (recordingStatus) recordingStatus.textContent = "Recording stopped. Preview and save below.";
+          }
+        });
+      }
+
+      if (saveRecordingBtn) {
+        saveRecordingBtn.addEventListener('click', async () => {
+          if (!currentRecordedBlob) return;
+          const title = (recordingTitleInput && recordingTitleInput.value.trim()) || 'Custom Voice Directive ' + (customAudioList.length + 1);
           
-          let mimeType = 'audio/webm';
-          if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
-          else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
-
-          mediaRecorder = new MediaRecorder(stream, { mimeType });
-          audioChunks = [];
-
-          mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) audioChunks.push(e.data);
+          const recording = {
+            id: 'rec_' + Date.now(),
+            title: title,
+            blobData: currentRecordedBlob,
+            mimeType: currentRecordedBlob.type,
+            date: new Date().toLocaleDateString()
           };
 
-          mediaRecorder.onstop = () => {
-            currentRecordedBlob = new Blob(audioChunks, { type: mimeType });
-            const audioUrl = URL.createObjectURL(currentRecordedBlob);
-            audioPreview.src = audioUrl;
-            recordingSaveContainer.classList.remove('hidden');
-          };
-
-          mediaRecorder.start();
-          recordBtn.disabled = true;
-          recordBtn.classList.add('opacity-50');
-          stopRecordBtn.disabled = false;
-          stopRecordBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
-          stopRecordBtn.classList.add('bg-slate-700', 'text-amber-400', 'hover:bg-slate-600');
-
-          recordingStatus.textContent = "Recording in progress...";
-          recordSeconds = 0;
-          recordTimer.textContent = "00:00";
-          recordTimer.classList.add('text-red-500');
-
-          recordInterval = setInterval(() => {
-            recordSeconds++;
-            const m = Math.floor(recordSeconds / 60).toString().padStart(2, '0');
-            const s = (recordSeconds % 60).toString().padStart(2, '0');
-            recordTimer.textContent = `${m}:${s}`;
-          }, 1000);
-
-        } catch (err) {
-          recordingStatus.textContent = "Error: Microphone permission denied.";
-          alert("Microphone permission error: " + err.message);
-        }
-      });
-
-      stopRecordBtn.addEventListener('click', () => {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-          mediaRecorder.stop();
-          mediaRecorder.stream.getTracks().forEach(track => track.stop());
-          clearInterval(recordInterval);
-          recordBtn.disabled = false;
-          recordBtn.classList.remove('opacity-50');
-          stopRecordBtn.disabled = true;
-          stopRecordBtn.classList.add('text-slate-500', 'cursor-not-allowed');
-          recordTimer.classList.remove('text-red-500');
-          recordingStatus.textContent = "Recording stopped. Preview and save below.";
-        }
-      });
-
-      saveRecordingBtn.addEventListener('click', async () => {
-        if (!currentRecordedBlob) return;
-        const title = recordingTitleInput.value.trim() || 'Custom Voice Directive ' + (customAudioList.length + 1);
-        
-        const recording = {
-          id: 'rec_' + Date.now(),
-          title: title,
-          blobData: currentRecordedBlob,
-          mimeType: currentRecordedBlob.type,
-          date: new Date().toLocaleDateString()
-        };
-
-        try {
-          await saveRecordingToDB(recording);
-          await loadRecordingsFromDB();
-          
-          recordingSaveContainer.classList.add('hidden');
-          recordingTitleInput.value = '';
-          recordingStatus.textContent = "Recording saved to library successfully!";
-        } catch(e) {
-          recordingStatus.textContent = "Error saving recording to storage.";
-          console.error(e);
-        }
-      });
+          try {
+            await saveRecordingToDB(recording);
+            await loadRecordingsFromDB();
+            
+            if (recordingSaveContainer) recordingSaveContainer.classList.add('hidden');
+            if (recordingTitleInput) recordingTitleInput.value = '';
+            if (recordingStatus) recordingStatus.textContent = "Recording saved to library successfully!";
+          } catch(e) {
+            if (recordingStatus) recordingStatus.textContent = "Error saving recording to storage.";
+            console.error(e);
+          }
+        });
+      }
     }
 
     function checkAlarms() {
@@ -839,11 +864,13 @@
 
     function triggerAlarm(alarm) {
       activeTriggeredAlarm = alarm;
-      modalAlarmTime.textContent = format12Hour(alarm.time);
-      modalAlarmLabel.textContent = alarm.label;
+      if (modalAlarmTime) modalAlarmTime.textContent = format12Hour(alarm.time);
+      if (modalAlarmLabel) modalAlarmLabel.textContent = alarm.label;
 
-      alarmModal.classList.remove('hidden');
-      alarmModal.classList.add('flex');
+      if (alarmModal) {
+        alarmModal.classList.remove('hidden');
+        alarmModal.classList.add('flex');
+      }
 
       if (alarm.audioSource.startsWith('sound-')) {
         const soundNames = {
@@ -853,70 +880,78 @@
           'sound-dog': '🐶 Realistic Dog Bark',
           'sound-cat': '🐱 Realistic Cat Meow'
         };
-        modalAudioTitle.textContent = soundNames[alarm.audioSource] || "Nature Soundscape";
+        if (modalAudioTitle) modalAudioTitle.textContent = soundNames[alarm.audioSource] || "Nature Soundscape";
         playSound(alarm.audioSource);
       } else if (alarm.audioSource === 'custom-speech') {
         const text = alarm.customText || "Time to take action and achieve your goal.";
-        modalAudioTitle.textContent = `"${text}"`;
+        if (modalAudioTitle) modalAudioTitle.textContent = `"${text}"`;
         speakText(text);
       } else {
         const customRec = customAudioList.find(r => r.id === alarm.audioSource);
         if (customRec) {
-          modalAudioTitle.textContent = `"${customRec.title}"`;
+          if (modalAudioTitle) modalAudioTitle.textContent = `"${customRec.title}"`;
           const blob = new Blob([customRec.blobData], { type: customRec.mimeType || 'audio/webm' });
           const url = URL.createObjectURL(blob);
           currentPlayingAudio = new Audio(url);
           currentPlayingAudio.play();
         } else {
-          modalAudioTitle.textContent = "Motivational Directive";
+          if (modalAudioTitle) modalAudioTitle.textContent = "Motivational Directive";
           speakText("Time to execute your tasks and reach your target.");
         }
       }
     }
 
-    dismissBtn.addEventListener('click', () => {
-      window.speechSynthesis.cancel();
-      stopSound();
-      if (currentPlayingAudio) {
-        currentPlayingAudio.pause();
-        currentPlayingAudio = null;
-      }
-      alarmModal.classList.add('hidden');
-      alarmModal.classList.remove('flex');
-      activeTriggeredAlarm = null;
-    });
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        window.speechSynthesis.cancel();
+        stopSound();
+        if (currentPlayingAudio) {
+          currentPlayingAudio.pause();
+          currentPlayingAudio = null;
+        }
+        if (alarmModal) {
+          alarmModal.classList.add('hidden');
+          alarmModal.classList.remove('flex');
+        }
+        activeTriggeredAlarm = null;
+      });
+    }
 
-    snoozeBtn.addEventListener('click', () => {
-      window.speechSynthesis.cancel();
-      stopSound();
-      if (currentPlayingAudio) {
-        currentPlayingAudio.pause();
-        currentPlayingAudio = null;
-      }
+    if (snoozeBtn) {
+      snoozeBtn.addEventListener('click', () => {
+        window.speechSynthesis.cancel();
+        stopSound();
+        if (currentPlayingAudio) {
+          currentPlayingAudio.pause();
+          currentPlayingAudio = null;
+        }
 
-      if (activeTriggeredAlarm) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() + 5);
-        const snoozeHours = now.getHours().toString().padStart(2, '0');
-        const snoozeMins = now.getMinutes().toString().padStart(2, '0');
+        if (activeTriggeredAlarm) {
+          const now = new Date();
+          now.setMinutes(now.getMinutes() + 5);
+          const snoozeHours = now.getHours().toString().padStart(2, '0');
+          const snoozeMins = now.getMinutes().toString().padStart(2, '0');
 
-        const snoozeAlarm = {
-          id: 'snooze_' + Date.now(),
-          time: `${snoozeHours}:${snoozeMins}`,
-          label: `[SNOOZE] ${activeTriggeredAlarm.label}`,
-          audioSource: activeTriggeredAlarm.audioSource,
-          customText: activeTriggeredAlarm.customText
-        };
+          const snoozeAlarm = {
+            id: 'snooze_' + Date.now(),
+            time: `${snoozeHours}:${snoozeMins}`,
+            label: `[SNOOZE] ${activeTriggeredAlarm.label}`,
+            audioSource: activeTriggeredAlarm.audioSource,
+            customText: activeTriggeredAlarm.customText
+          };
 
-        alarms.push(snoozeAlarm);
-        localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
-        renderAlarms();
-      }
+          alarms.push(snoozeAlarm);
+          localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
+          renderAlarms();
+        }
 
-      alarmModal.classList.add('hidden');
-      alarmModal.classList.remove('flex');
-      activeTriggeredAlarm = null;
-    });
+        if (alarmModal) {
+          alarmModal.classList.add('hidden');
+          alarmModal.classList.remove('flex');
+        }
+        activeTriggeredAlarm = null;
+      });
+    }
 
     init();
   </script>
