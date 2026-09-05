@@ -23,7 +23,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    input[type="time"]::-webkit-calendar-picker-indicator {
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
       filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg);
       cursor: pointer;
     }
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div id="liveClock" class="text-xl md:text-3xl font-mono font-semibold text-amber-400 tracking-wider">
-        00:00:00 AM
+        00/00/0000 00:00:00 AM
       </div>
     </header>
 
@@ -61,16 +61,23 @@
           </h2>
 
           <form id="alarmForm" class="space-y-4" novalidate>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Time</label>
-                <input type="time" id="alarmTime" required step="60" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-lg focus:outline-none focus:border-amber-400 transition">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs uppercase tracking-wider text-slate-400">Date & Time</label>
+                <!-- Quick Preset Buttons -->
+                <div class="space-x-1">
+                  <button type="button" onclick="setQuickTime(15)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+15 Mins</button>
+                  <button type="button" onclick="setQuickTime(30)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+30 Mins</button>
+                  <button type="button" onclick="setQuickTime(60)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+1 Hour</button>
+                  <button type="button" onclick="setTomorrowMorning()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Tomorrow AM</button>
+                </div>
               </div>
+              <input type="datetime-local" id="alarmTime" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-300 font-mono text-base focus:outline-none focus:border-amber-400 transition">
+            </div>
 
-              <div>
-                <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Objective / Label</label>
-                <input type="text" id="alarmLabel" placeholder="e.g. Q3 Sales Goal Review" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400 transition">
-              </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Objective / Label</label>
+              <input type="text" id="alarmLabel" placeholder="e.g. Q3 Sales Goal Review" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400 transition">
             </div>
 
             <div>
@@ -127,7 +134,7 @@
           <div id="alarmList" class="space-y-3">
             <div class="text-center py-8 text-slate-500 border border-dashed border-slate-800 rounded-xl">
               <i class="fa-solid fa-clock-rotate-left text-2xl mb-2 text-slate-600"></i>
-              <p>No active alarms set. Choose a time and message above to schedule.</p>
+              <p>No active alarms set. Choose a date, time, and message above to schedule.</p>
             </div>
           </div>
         </div>
@@ -255,7 +262,7 @@
       </div>
 
       <div>
-        <div id="modalAlarmTime" class="text-4xl font-mono font-bold text-amber-400 mb-2">00:00 AM</div>
+        <div id="modalAlarmTime" class="text-2xl font-mono font-bold text-amber-400 mb-2">00/00 00:00 AM</div>
         <h3 id="modalAlarmLabel" class="text-2xl font-bold text-slate-100 mb-1">Executive Focus Time</h3>
         <p class="text-xs text-slate-400">Scheduled Success Directive</p>
       </div>
@@ -311,6 +318,7 @@
 
     const liveClockEl = document.getElementById('liveClock');
     const alarmForm = document.getElementById('alarmForm');
+    const alarmTimeInput = document.getElementById('alarmTime');
     const alarmListEl = document.getElementById('alarmList');
     const alarmCountBadge = document.getElementById('alarmCountBadge');
     const audioSourceTypeSelect = document.getElementById('audioSourceType');
@@ -343,6 +351,35 @@
     const snoozeBtn = document.getElementById('snoozeBtn');
 
     if (customSpeechText) customSpeechText.value = templates[1];
+
+    // Helper to format Date object into HTML datetime-local input format (YYYY-MM-DDTHH:MM)
+    function formatForDateTimeInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // Set default field value to current time + 15 mins
+    if (alarmTimeInput) {
+      const defaultTime = new Date(Date.now() + 15 * 60000);
+      alarmTimeInput.value = formatForDateTimeInput(defaultTime);
+    }
+
+    // Quick Time Helper Functions
+    window.setQuickTime = function(minutesToAdd) {
+      const target = new Date(Date.now() + minutesToAdd * 60000);
+      if (alarmTimeInput) alarmTimeInput.value = formatForDateTimeInput(target);
+    };
+
+    window.setTomorrowMorning = function() {
+      const target = new Date();
+      target.setDate(target.getDate() + 1);
+      target.setHours(7, 0, 0, 0); // Default to 7:00 AM
+      if (alarmTimeInput) alarmTimeInput.value = formatForDateTimeInput(target);
+    };
 
     // Unlock Web Audio Context on user click
     document.addEventListener('click', () => {
@@ -575,7 +612,8 @@
     function updateClock() {
       if (liveClockEl) {
         const now = new Date();
-        liveClockEl.textContent = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        liveClockEl.textContent = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) + ' ' +
+                                  now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
       }
     }
 
@@ -659,13 +697,13 @@
         alarmListEl.innerHTML = `
           <div class="text-center py-8 text-slate-500 border border-dashed border-slate-800 rounded-xl">
             <i class="fa-solid fa-clock-rotate-left text-2xl mb-2 text-slate-600"></i>
-            <p>No active alarms set. Choose a time and message above to schedule.</p>
+            <p>No active alarms set. Choose a date, time, and message above to schedule.</p>
           </div>`;
         return;
       }
 
       alarmListEl.innerHTML = '';
-      alarms.sort((a, b) => a.time.localeCompare(b.time)).forEach(alarm => {
+      alarms.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)).forEach(alarm => {
         const item = document.createElement('div');
         item.className = "bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between";
         
@@ -685,8 +723,8 @@
 
         item.innerHTML = `
           <div class="flex items-center space-x-4">
-            <div class="text-2xl font-mono font-bold text-amber-400">${format12Hour(alarm.time)}</div>
             <div>
+              <div class="text-lg font-mono font-bold text-amber-400">${formatDateTimeDisplay(alarm.dateTime)}</div>
               <div class="text-sm font-semibold text-slate-200">${alarm.label}</div>
               <div class="text-xs text-slate-500">${audioLabel}</div>
             </div>
@@ -699,35 +737,40 @@
       });
     }
 
-    function format12Hour(timeStr) {
-      if (!timeStr) return '';
-      const [h, m] = timeStr.split(':');
-      let hour = parseInt(h, 10);
-      if (isNaN(hour)) return timeStr;
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      hour = hour % 12 || 12;
-      return `${hour.toString().padStart(2, '0')}:${m || '00'} ${ampm}`;
+    function formatDateTimeDisplay(dateTimeStr) {
+      if (!dateTimeStr) return '';
+      const d = new Date(dateTimeStr);
+      if (isNaN(d.getTime())) return dateTimeStr;
+      
+      const datePart = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: '2-digit' });
+      const timePart = d.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+      return `${datePart} ${timePart}`;
     }
 
     if (alarmForm) {
       alarmForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const timeInput = document.getElementById('alarmTime');
+        const dateTimeVal = alarmTimeInput ? alarmTimeInput.value : '';
         const labelInput = document.getElementById('alarmLabel');
-        
-        let timeVal = timeInput.value ? timeInput.value.trim() : '';
         const labelVal = labelInput.value ? labelInput.value.trim() : '';
         const sourceVal = audioSourceTypeSelect.value;
         const messageTextVal = customSpeechText ? customSpeechText.value : '';
 
-        if (!timeVal) {
-          alert("Please enter a valid time.");
-          timeInput.focus();
+        if (!dateTimeVal) {
+          alert("Please select a valid date and time.");
+          alarmTimeInput.focus();
           return;
         }
 
-        if (timeVal.length > 5) {
-          timeVal = timeVal.substring(0, 5);
+        const selectedTimestamp = new Date(dateTimeVal).getTime();
+        if (isNaN(selectedTimestamp)) {
+          alert("Invalid date and time selected.");
+          return;
+        }
+
+        if (selectedTimestamp < Date.now() - 60000) {
+          alert("Please select a date and time in the future.");
+          return;
         }
 
         if (!labelVal) {
@@ -738,7 +781,8 @@
 
         const newAlarm = {
           id: 'alarm_' + Date.now(),
-          time: timeVal,
+          dateTime: dateTimeVal,
+          timestamp: selectedTimestamp,
           label: labelVal,
           audioSource: sourceVal,
           customText: messageTextVal,
@@ -864,27 +908,22 @@
       }
     }
 
-    // Improved alarm trigger check
+    // Improved alarm trigger check using timestamp comparison
     function checkAlarms() {
-      const now = new Date();
-      const currentHours = now.getHours().toString().padStart(2, '0');
-      const currentMinutes = now.getMinutes().toString().padStart(2, '0');
-      const currentTimeStr = `${currentHours}:${currentMinutes}`;
+      const now = Date.now();
 
       alarms.forEach(alarm => {
-        if (alarm.time === currentTimeStr && !alarm.triggered && !activeTriggeredAlarm) {
+        const targetTime = alarm.timestamp || new Date(alarm.dateTime).getTime();
+        if (now >= targetTime && !alarm.triggered && !activeTriggeredAlarm) {
           alarm.triggered = true;
           triggerAlarm(alarm);
-        } else if (alarm.time !== currentTimeStr) {
-          // Reset trigger flag once the minute moves past
-          alarm.triggered = false;
         }
       });
     }
 
     function triggerAlarm(alarm) {
       activeTriggeredAlarm = alarm;
-      if (modalAlarmTime) modalAlarmTime.textContent = format12Hour(alarm.time);
+      if (modalAlarmTime) modalAlarmTime.textContent = formatDateTimeDisplay(alarm.dateTime);
       if (modalAlarmLabel) modalAlarmLabel.textContent = alarm.label;
 
       if (alarmModal) {
@@ -932,6 +971,13 @@
           alarmModal.classList.add('hidden');
           alarmModal.classList.remove('flex');
         }
+        
+        // Remove triggered alarm from active list
+        if (activeTriggeredAlarm) {
+          alarms = alarms.filter(a => a.id !== activeTriggeredAlarm.id);
+          localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
+          renderAlarms();
+        }
         activeTriggeredAlarm = null;
       });
     }
@@ -946,14 +992,15 @@
         }
 
         if (activeTriggeredAlarm) {
-          const now = new Date();
-          now.setMinutes(now.getMinutes() + 5);
-          const snoozeHours = now.getHours().toString().padStart(2, '0');
-          const snoozeMins = now.getMinutes().toString().padStart(2, '0');
+          const snoozeDate = new Date(Date.now() + 5 * 60000);
+          
+          // Remove old alarm
+          alarms = alarms.filter(a => a.id !== activeTriggeredAlarm.id);
 
           const snoozeAlarm = {
             id: 'snooze_' + Date.now(),
-            time: `${snoozeHours}:${snoozeMins}`,
+            dateTime: formatForDateTimeInput(snoozeDate),
+            timestamp: snoozeDate.getTime(),
             label: `[SNOOZE] ${activeTriggeredAlarm.label}`,
             audioSource: activeTriggeredAlarm.audioSource,
             customText: activeTriggeredAlarm.customText,
