@@ -45,7 +45,7 @@
         </div>
       </div>
       <div id="liveClock" class="text-xl md:text-3xl font-mono font-semibold text-amber-400 tracking-wider">
-        00/00/0000 00:00:00 AM
+        --/--/---- --:--:-- --
       </div>
     </header>
 
@@ -66,7 +66,6 @@
                 <label class="block text-xs uppercase tracking-wider text-slate-400">Date & Time (Pick Exact Minute or Use Quick Buttons)</label>
                 <!-- Quick Preset Buttons -->
                 <div class="space-x-1">
-                  <button type="button" onclick="setQuickTime(4)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+4 Mins</button>
                   <button type="button" onclick="setQuickTime(15)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+15 Mins</button>
                   <button type="button" onclick="setQuickTime(30)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+30 Mins</button>
                   <button type="button" onclick="setQuickTime(60)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">+1 Hour</button>
@@ -318,41 +317,39 @@
       3: "Discipline equals freedom. Maintain extreme focus on primary business objectives. Eliminate distractions and conquer the task."
     };
 
-    const liveClockEl = document.getElementById('liveClock');
-    const alarmForm = document.getElementById('alarmForm');
-    const alarmTimeInput = document.getElementById('alarmTime');
-    const alarmListEl = document.getElementById('alarmList');
-    const alarmCountBadge = document.getElementById('alarmCountBadge');
-    const audioSourceTypeSelect = document.getElementById('audioSourceType');
-    const recordingsOptGroup = document.getElementById('recordingsOptGroup');
-    const savedRecordingsList = document.getElementById('savedRecordingsList');
-    const voiceSelectDropdown = document.getElementById('voiceSelectDropdown');
-    const customSpeechText = document.getElementById('customSpeechText');
-    const customSpeechContainer = document.getElementById('customSpeechContainer');
+    let liveClockEl;
+    let alarmForm;
+    let alarmTimeInput;
+    let alarmListEl;
+    let alarmCountBadge;
+    let audioSourceTypeSelect;
+    let recordingsOptGroup;
+    let savedRecordingsList;
+    let voiceSelectDropdown;
+    let customSpeechText;
+    let customSpeechContainer;
 
-    const tabFemale = document.getElementById('tabFemale');
-    const tabMale = document.getElementById('tabMale');
-    const tabNature = document.getElementById('tabNature');
-    const voiceDropdownContainer = document.getElementById('voiceDropdownContainer');
-    const natureSoundsContainer = document.getElementById('natureSoundsContainer');
+    let tabFemale;
+    let tabMale;
+    let tabNature;
+    let voiceDropdownContainer;
+    let natureSoundsContainer;
 
-    const recordBtn = document.getElementById('recordBtn');
-    const stopRecordBtn = document.getElementById('stopRecordBtn');
-    const recordTimer = document.getElementById('recordTimer');
-    const recordingStatus = document.getElementById('recordingStatus');
-    const recordingSaveContainer = document.getElementById('recordingSaveContainer');
-    const audioPreview = document.getElementById('audioPreview');
-    const recordingTitleInput = document.getElementById('recordingTitle');
-    const saveRecordingBtn = document.getElementById('saveRecordingBtn');
+    let recordBtn;
+    let stopRecordBtn;
+    let recordTimer;
+    let recordingStatus;
+    let recordingSaveContainer;
+    let audioPreview;
+    let recordingTitleInput;
+    let saveRecordingBtn;
 
-    const alarmModal = document.getElementById('alarmModal');
-    const modalAlarmTime = document.getElementById('modalAlarmTime');
-    const modalAlarmLabel = document.getElementById('modalAlarmLabel');
-    const modalAudioTitle = document.getElementById('modalAudioTitle');
-    const dismissBtn = document.getElementById('dismissBtn');
-    const snoozeBtn = document.getElementById('snoozeBtn');
-
-    if (customSpeechText) customSpeechText.value = templates[1];
+    let alarmModal;
+    let modalAlarmTime;
+    let modalAlarmLabel;
+    let modalAudioTitle;
+    let dismissBtn;
+    let snoozeBtn;
 
     function formatForDateTimeInput(date) {
       const year = date.getFullYear();
@@ -361,11 +358,6 @@
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
-
-    if (alarmTimeInput) {
-      const defaultTime = new Date(Date.now() + 15 * 60000);
-      alarmTimeInput.value = formatForDateTimeInput(defaultTime);
     }
 
     window.setQuickTime = function(minutesToAdd) {
@@ -479,26 +471,6 @@
       };
     }
 
-    async function saveRecordingToDB(recording) {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction('recordings', 'readwrite');
-        const store = tx.objectStore('recordings');
-        const req = store.put(recording);
-        req.onsuccess = () => resolve();
-        req.onerror = (e) => reject(e);
-      });
-    }
-
-    async function deleteRecordingFromDB(id) {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction('recordings', 'readwrite');
-        const store = tx.objectStore('recordings');
-        const req = store.delete(id);
-        req.onsuccess = () => resolve();
-        req.onerror = (e) => reject(e);
-      });
-    }
-
     function loadAndFilterVoices() {
       if (!('speechSynthesis' in window)) return;
       
@@ -560,17 +532,6 @@
       }
     }
 
-    if (voiceSelectDropdown) {
-      voiceSelectDropdown.addEventListener('change', (e) => {
-        selectedVoice = allSystemVoices.find(v => v.name === e.target.value);
-      });
-    }
-
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = loadAndFilterVoices;
-      loadAndFilterVoices();
-    }
-
     function testSelectedVoice() {
       speakText("Hello executive. Voice engine test successful. Ready to drive performance.");
     }
@@ -585,46 +546,136 @@
     }
 
     function speakText(text) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+        utterance.rate = 0.95;
+        utterance.pitch = currentGenderFilter === 'male' ? 0.95 : 1.05;
+        window.speechSynthesis.speak(utterance);
       }
-      utterance.rate = 0.95;
-      utterance.pitch = currentGenderFilter === 'male' ? 0.95 : 1.05;
-      window.speechSynthesis.speak(utterance);
-    }
-
-    async function init() {
-      updateClock();
-      setInterval(updateClock, 1000);
-      try {
-        await initDB();
-        await loadRecordingsFromDB();
-      } catch(e) {
-        console.error("Database initialization failed:", e);
-      }
-      renderAlarms();
-      setupRecorder();
-      setInterval(checkAlarms, 1000);
     }
 
     function updateClock() {
-      if (liveClockEl) {
-        const now = new Date();
-        liveClockEl.textContent = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) + ' ' +
-                                  now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      if (!liveClockEl) return;
+      const now = new Date();
+      
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const year = now.getFullYear();
+
+      let hours = now.getHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // convert 0 to 12
+      const formattedHours = String(hours).padStart(2, '0');
+
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+
+      liveClockEl.textContent = `${month}/${day}/${year} ${formattedHours}:${minutes}:${seconds} ${ampm}`;
+    }
+
+    function renderAlarms() {
+      if (!alarmListEl) return;
+      if (alarmCountBadge) alarmCountBadge.textContent = `${alarms.length} Active`;
+      
+      if (alarms.length === 0) {
+        alarmListEl.innerHTML = `
+          <div class="text-center py-8 text-slate-500 border border-dashed border-slate-800 rounded-xl">
+            <i class="fa-solid fa-clock-rotate-left text-2xl mb-2 text-slate-600"></i>
+            <p>No active alarms set. Choose a date, time, and message above to schedule.</p>
+          </div>`;
+        return;
+      }
+
+      alarmListEl.innerHTML = alarms.map((item, index) => {
+        const dt = new Date(item.time);
+        const formattedDate = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="flex items-center justify-between p-3.5 bg-slate-950 border border-slate-800 rounded-xl">
+            <div>
+              <div class="text-amber-400 font-mono font-bold text-sm">${formattedDate}</div>
+              <div class="text-slate-200 font-medium text-sm">${item.label}</div>
+            </div>
+            <button onclick="deleteAlarm(${index})" class="text-slate-500 hover:text-red-400 p-2 transition">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>`;
+      }).join('');
+    }
+
+    window.deleteAlarm = function(index) {
+      alarms.splice(index, 1);
+      localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
+      renderAlarms();
+    };
+
+    function checkAlarms() {
+      const now = new Date();
+      alarms.forEach((alarm, index) => {
+        const alarmTime = new Date(alarm.time);
+        if (now >= alarmTime && !alarm.triggered) {
+          alarm.triggered = true;
+          triggerAlarm(alarm);
+          deleteAlarm(index);
+        }
+      });
+    }
+
+    function triggerAlarm(alarm) {
+      if (modalAlarmTime) modalAlarmTime.textContent = new Date(alarm.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (modalAlarmLabel) modalAlarmLabel.textContent = alarm.label;
+      if (modalAudioTitle) modalAudioTitle.textContent = `"${alarm.speech || 'Scheduled Alarm'}"`;
+      if (alarmModal) alarmModal.classList.remove('hidden');
+
+      if (alarm.audioType === 'custom-speech' && alarm.speech) {
+        speakText(alarm.speech);
+      } else if (alarm.audioType) {
+        playSound(alarm.audioType);
       }
     }
 
-    if (audioSourceTypeSelect) {
-      audioSourceTypeSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'custom-speech') {
-          if (customSpeechContainer) customSpeechContainer.classList.remove('hidden');
-        } else {
-          if (customSpeechContainer) customSpeechContainer.classList.add('hidden');
+    function setupRecorder() {
+      if (!recordBtn) return;
+      recordBtn.addEventListener('click', async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            currentRecordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            if (audioPreview) audioPreview.src = URL.createObjectURL(currentRecordedBlob);
+            if (recordingSaveContainer) recordingSaveContainer.classList.remove('hidden');
+          };
+          mediaRecorder.start();
+          if (recordBtn) recordBtn.disabled = true;
+          if (stopRecordBtn) stopRecordBtn.disabled = false;
+          recordSeconds = 0;
+          recordInterval = setInterval(() => {
+            recordSeconds++;
+            const mins = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+            const secs = String(recordSeconds % 60).padStart(2, '0');
+            if (recordTimer) recordTimer.textContent = `${mins}:${secs}`;
+          }, 1000);
+        } catch(e) {
+          alert("Microphone access denied or not supported.");
         }
       });
+
+      if (stopRecordBtn) {
+        stopRecordBtn.addEventListener('click', () => {
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            clearInterval(recordInterval);
+            if (recordBtn) recordBtn.disabled = false;
+            if (stopRecordBtn) stopRecordBtn.disabled = true;
+          }
+        });
+      }
     }
 
     function renderCustomAudioOptions() {
@@ -651,373 +702,142 @@
       if (customAudioList.length === 0) {
         savedRecordingsList.innerHTML = `
           <div class="text-center py-6 text-slate-500 border border-dashed border-slate-800 rounded-xl text-xs">
-            No recordings saved yet. Record a voice memo above to build your list.
+            No recordings saved yet.
           </div>`;
-        return;
       }
-
-      customAudioList.forEach(rec => {
-        const item = document.createElement('div');
-        item.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between";
-        item.innerHTML = `
-          <div>
-            <div class="text-sm font-medium text-slate-200">🎙️ ${rec.title}</div>
-            <div class="text-xs text-slate-500">${rec.date || 'Saved Voice Recording'}</div>
-          </div>
-          <div class="flex items-center space-x-2">
-            <button type="button" onclick="playSavedAudio('${rec.id}')" class="text-amber-400 hover:text-amber-300 p-2"><i class="fa-solid fa-circle-play text-xl"></i></button>
-            <button type="button" onclick="deleteSavedAudio('${rec.id}')" class="text-slate-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
-          </div>
-        `;
-        savedRecordingsList.appendChild(item);
-      });
     }
 
-    window.playSavedAudio = function(id) {
-      stopSound();
-      const rec = customAudioList.find(r => r.id === id);
-      if (rec) {
-        if (currentPlayingAudio) currentPlayingAudio.pause();
-        const blob = new Blob([rec.blobData], { type: rec.mimeType || 'audio/webm' });
-        const url = URL.createObjectURL(blob);
-        currentPlayingAudio = new Audio(url);
-        currentPlayingAudio.play();
-      }
-    };
+    async function init() {
+      liveClockEl = document.getElementById('liveClock');
+      alarmForm = document.getElementById('alarmForm');
+      alarmTimeInput = document.getElementById('alarmTime');
+      alarmListEl = document.getElementById('alarmList');
+      alarmCountBadge = document.getElementById('alarmCountBadge');
+      audioSourceTypeSelect = document.getElementById('audioSourceType');
+      recordingsOptGroup = document.getElementById('recordingsOptGroup');
+      savedRecordingsList = document.getElementById('savedRecordingsList');
+      voiceSelectDropdown = document.getElementById('voiceSelectDropdown');
+      customSpeechText = document.getElementById('customSpeechText');
+      customSpeechContainer = document.getElementById('customSpeechContainer');
 
-    window.deleteSavedAudio = async function(id) {
-      await deleteRecordingFromDB(id);
-      await loadRecordingsFromDB();
-    };
+      tabFemale = document.getElementById('tabFemale');
+      tabMale = document.getElementById('tabMale');
+      tabNature = document.getElementById('tabNature');
+      voiceDropdownContainer = document.getElementById('voiceDropdownContainer');
+      natureSoundsContainer = document.getElementById('natureSoundsContainer');
 
-    function renderAlarms() {
-      if (!alarmCountBadge || !alarmListEl) return;
-      alarmCountBadge.textContent = `${alarms.length} Active`;
-      if (alarms.length === 0) {
-        alarmListEl.innerHTML = `
-          <div class="text-center py-8 text-slate-500 border border-dashed border-slate-800 rounded-xl">
-            <i class="fa-solid fa-clock-rotate-left text-2xl mb-2 text-slate-600"></i>
-            <p>No active alarms set. Choose a date, time, and message above to schedule.</p>
-          </div>`;
-        return;
-      }
+      recordBtn = document.getElementById('recordBtn');
+      stopRecordBtn = document.getElementById('stopRecordBtn');
+      recordTimer = document.getElementById('recordTimer');
+      recordingStatus = document.getElementById('recordingStatus');
+      recordingSaveContainer = document.getElementById('recordingSaveContainer');
+      audioPreview = document.getElementById('audioPreview');
+      recordingTitleInput = document.getElementById('recordingTitle');
+      saveRecordingBtn = document.getElementById('saveRecordingBtn');
 
-      alarmListEl.innerHTML = '';
-      alarms.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)).forEach(alarm => {
-        const item = document.createElement('div');
-        item.className = "bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between";
-        
-        let audioLabel = "Custom AI Speech Message";
-        if (alarm.audioSource.startsWith('sound-')) {
-          const names = {
-            'sound-rain': '🌧️ Gentle Rain',
-            'sound-stream': '🌊 Babbling Stream',
-            'sound-birds': '🎵 Song',
-            'sound-dog': '🐶 Realistic Dog Bark'
-          };
-          audioLabel = names[alarm.audioSource] || alarm.audioSource;
-        } else if (alarm.audioSource !== 'custom-speech') {
-          const rec = customAudioList.find(r => r.id === alarm.audioSource);
-          if (rec) audioLabel = `🎙️ ${rec.title}`;
-        }
+      alarmModal = document.getElementById('alarmModal');
+      modalAlarmTime = document.getElementById('modalAlarmTime');
+      modalAlarmLabel = document.getElementById('modalAlarmLabel');
+      modalAudioTitle = document.getElementById('modalAudioTitle');
+      dismissBtn = document.getElementById('dismissBtn');
+      snoozeBtn = document.getElementById('snoozeBtn');
 
-        item.innerHTML = `
-          <div class="flex items-center space-x-4">
-            <div>
-              <div class="text-lg font-mono font-bold text-amber-400">${formatDateTimeDisplay(alarm.dateTime)}</div>
-              <div class="text-sm font-semibold text-slate-200">${alarm.label}</div>
-              <div class="text-xs text-slate-500">${audioLabel}</div>
-            </div>
-          </div>
-          <button type="button" onclick="deleteAlarm('${alarm.id}')" class="text-slate-500 hover:text-red-400 p-2 transition">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        `;
-        alarmListEl.appendChild(item);
-      });
-    }
+      if (customSpeechText) customSpeechText.value = templates[1];
 
-    function formatDateTimeDisplay(dateTimeStr) {
-      if (!dateTimeStr) return '';
-      const d = new Date(dateTimeStr);
-      if (isNaN(d.getTime())) return dateTimeStr;
-      
-      const datePart = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: '2-digit' });
-      const timePart = d.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
-      return `${datePart} ${timePart}`;
-    }
-
-    if (alarmForm) {
-      alarmForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const dateTimeVal = alarmTimeInput ? alarmTimeInput.value : '';
-        const labelInput = document.getElementById('alarmLabel');
-        const labelVal = labelInput.value ? labelInput.value.trim() : '';
-        const sourceVal = audioSourceTypeSelect.value;
-        const messageTextVal = customSpeechText ? customSpeechText.value : '';
-
-        if (!dateTimeVal) {
-          alert("Please select a valid date and time.");
-          alarmTimeInput.focus();
-          return;
-        }
-
-        const selectedTimestamp = new Date(dateTimeVal).getTime();
-        if (isNaN(selectedTimestamp)) {
-          alert("Invalid date and time selected.");
-          return;
-        }
-
-        if (selectedTimestamp < Date.now() - 30000) {
-          alert("Please select a date and time in the future.");
-          return;
-        }
-
-        if (!labelVal) {
-          alert("Please enter an objective or label for your alarm.");
-          labelInput.focus();
-          return;
-        }
-
-        const newAlarm = {
-          id: 'alarm_' + Date.now(),
-          dateTime: dateTimeVal,
-          timestamp: selectedTimestamp,
-          label: labelVal,
-          audioSource: sourceVal,
-          customText: messageTextVal,
-          triggered: false
-        };
-
-        alarms.push(newAlarm);
-        localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
-        renderAlarms();
-        labelInput.value = '';
-      });
-    }
-
-    window.deleteAlarm = function(id) {
-      alarms = alarms.filter(a => a.id !== id);
-      localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
-      renderAlarms();
-    };
-
-    function setupRecorder() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        if (recordingStatus) recordingStatus.textContent = "Microphone recording not supported on this browser.";
-        if (recordBtn) recordBtn.disabled = true;
-        return;
+      if (alarmTimeInput) {
+        const defaultTime = new Date(Date.now() + 15 * 60000);
+        alarmTimeInput.value = formatForDateTimeInput(defaultTime);
       }
 
-      if (recordBtn) {
-        recordBtn.addEventListener('click', async () => {
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            
-            let mimeType = 'audio/webm';
-            if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
-            else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
+      if (voiceSelectDropdown) {
+        voiceSelectDropdown.addEventListener('change', (e) => {
+          selectedVoice = allSystemVoices.find(v => v.name === e.target.value);
+        });
+      }
 
-            mediaRecorder = new MediaRecorder(stream, { mimeType });
-            audioChunks = [];
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = loadAndFilterVoices;
+        loadAndFilterVoices();
+      }
 
-            mediaRecorder.ondataavailable = (e) => {
-              if (e.data.size > 0) audioChunks.push(e.data);
-            };
-
-            mediaRecorder.onstop = () => {
-              currentRecordedBlob = new Blob(audioChunks, { type: mimeType });
-              const audioUrl = URL.createObjectURL(currentRecordedBlob);
-              if (audioPreview) audioPreview.src = audioUrl;
-              if (recordingSaveContainer) recordingSaveContainer.classList.remove('hidden');
-            };
-
-            mediaRecorder.start();
-            recordBtn.disabled = true;
-            recordBtn.classList.add('opacity-50');
-            if (stopRecordBtn) {
-              stopRecordBtn.disabled = false;
-              stopRecordBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
-              stopRecordBtn.classList.add('bg-slate-700', 'text-amber-400', 'hover:bg-slate-600');
-            }
-
-            if (recordingStatus) recordingStatus.textContent = "Recording in progress...";
-            recordSeconds = 0;
-            if (recordTimer) {
-              recordTimer.textContent = "00:00";
-              recordTimer.classList.add('text-red-500');
-            }
-
-            recordInterval = setInterval(() => {
-              recordSeconds++;
-              const m = Math.floor(recordSeconds / 60).toString().padStart(2, '0');
-              const s = (recordSeconds % 60).toString().padStart(2, '0');
-              if (recordTimer) recordTimer.textContent = `${m}:${s}`;
-            }, 1000);
-
-          } catch (err) {
-            if (recordingStatus) recordingStatus.textContent = "Error: Microphone permission denied.";
-            alert("Microphone permission error: " + err.message);
+      if (audioSourceTypeSelect) {
+        audioSourceTypeSelect.addEventListener('change', (e) => {
+          if (e.target.value === 'custom-speech') {
+            if (customSpeechContainer) customSpeechContainer.classList.remove('hidden');
+          } else {
+            if (customSpeechContainer) customSpeechContainer.classList.add('hidden');
           }
         });
       }
 
-      if (stopRecordBtn) {
-        stopRecordBtn.addEventListener('click', () => {
-          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
-            mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            clearInterval(recordInterval);
-            if (recordBtn) {
-              recordBtn.disabled = false;
-              recordBtn.classList.remove('opacity-50');
-            }
-            stopRecordBtn.disabled = true;
-            stopRecordBtn.classList.add('text-slate-500', 'cursor-not-allowed');
-            if (recordTimer) recordTimer.classList.remove('text-red-500');
-            if (recordingStatus) recordingStatus.textContent = "Recording stopped. Preview and save below.";
-          }
-        });
-      }
+      if (alarmForm) {
+        alarmForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const timeVal = alarmTimeInput.value;
+          const labelVal = document.getElementById('alarmLabel').value || 'Executive Reminder';
+          const audioType = audioSourceTypeSelect.value;
+          const speechVal = customSpeechText ? customSpeechText.value : '';
 
-      if (saveRecordingBtn) {
-        saveRecordingBtn.addEventListener('click', async () => {
-          if (!currentRecordedBlob) return;
-          const title = (recordingTitleInput && recordingTitleInput.value.trim()) || 'Custom Voice Directive ' + (customAudioList.length + 1);
-          
-          const recording = {
-            id: 'rec_' + Date.now(),
-            title: title,
-            blobData: currentRecordedBlob,
-            mimeType: currentRecordedBlob.type,
-            date: new Date().toLocaleDateString()
-          };
+          if (!timeVal) return;
 
-          try {
-            await saveRecordingToDB(recording);
-            await loadRecordingsFromDB();
-            
-            if (recordingSaveContainer) recordingSaveContainer.classList.add('hidden');
-            if (recordingTitleInput) recordingTitleInput.value = '';
-            if (recordingStatus) recordingStatus.textContent = "Recording saved to library successfully!";
-          } catch(e) {
-            if (recordingStatus) recordingStatus.textContent = "Error saving recording to storage.";
-            console.error(e);
-          }
-        });
-      }
-    }
-
-    function checkAlarms() {
-      const now = Date.now();
-
-      alarms.forEach(alarm => {
-        const targetTime = alarm.timestamp || new Date(alarm.dateTime).getTime();
-        if (now >= targetTime && !alarm.triggered && !activeTriggeredAlarm) {
-          alarm.triggered = true;
-          triggerAlarm(alarm);
-        }
-      });
-    }
-
-    function triggerAlarm(alarm) {
-      activeTriggeredAlarm = alarm;
-      if (modalAlarmTime) modalAlarmTime.textContent = formatDateTimeDisplay(alarm.dateTime);
-      if (modalAlarmLabel) modalAlarmLabel.textContent = alarm.label;
-
-      if (alarmModal) {
-        alarmModal.classList.remove('hidden');
-        alarmModal.classList.add('flex');
-      }
-
-      if (alarm.audioSource.startsWith('sound-')) {
-        const soundNames = {
-          'sound-rain': '🌧️ Gentle Rain Soundscape',
-          'sound-stream': '🌊 Babbling Stream Soundscape',
-          'sound-birds': '🎵 Song',
-          'sound-dog': '🐶 Realistic Dog Bark'
-        };
-        if (modalAudioTitle) modalAudioTitle.textContent = soundNames[alarm.audioSource] || "Nature Soundscape";
-        playSound(alarm.audioSource);
-      } else if (alarm.audioSource === 'custom-speech') {
-        const text = alarm.customText || "Time to take action and achieve your goal.";
-        if (modalAudioTitle) modalAudioTitle.textContent = `"${text}"`;
-        speakText(text);
-      } else {
-        const customRec = customAudioList.find(r => r.id === alarm.audioSource);
-        if (customRec) {
-          if (modalAudioTitle) modalAudioTitle.textContent = `"${customRec.title}"`;
-          const blob = new Blob([customRec.blobData], { type: customRec.mimeType || 'audio/webm' });
-          const url = URL.createObjectURL(blob);
-          currentPlayingAudio = new Audio(url);
-          currentPlayingAudio.play();
-        } else {
-          if (modalAudioTitle) modalAudioTitle.textContent = "Motivational Directive";
-          speakText("Time to execute your tasks and reach your target.");
-        }
-      }
-    }
-
-    if (dismissBtn) {
-      dismissBtn.addEventListener('click', () => {
-        window.speechSynthesis.cancel();
-        stopSound();
-        if (currentPlayingAudio) {
-          currentPlayingAudio.pause();
-          currentPlayingAudio = null;
-        }
-        if (alarmModal) {
-          alarmModal.classList.add('hidden');
-          alarmModal.classList.remove('flex');
-        }
-        
-        if (activeTriggeredAlarm) {
-          alarms = alarms.filter(a => a.id !== activeTriggeredAlarm.id);
-          localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
-          renderAlarms();
-        }
-        activeTriggeredAlarm = null;
-      });
-    }
-
-    if (snoozeBtn) {
-      snoozeBtn.addEventListener('click', () => {
-        window.speechSynthesis.cancel();
-        stopSound();
-        if (currentPlayingAudio) {
-          currentPlayingAudio.pause();
-          currentPlayingAudio = null;
-        }
-
-        if (activeTriggeredAlarm) {
-          const snoozeDate = new Date(Date.now() + 5 * 60000);
-          
-          alarms = alarms.filter(a => a.id !== activeTriggeredAlarm.id);
-
-          const snoozeAlarm = {
-            id: 'snooze_' + Date.now(),
-            dateTime: formatForDateTimeInput(snoozeDate),
-            timestamp: snoozeDate.getTime(),
-            label: `[SNOOZE] ${activeTriggeredAlarm.label}`,
-            audioSource: activeTriggeredAlarm.audioSource,
-            customText: activeTriggeredAlarm.customText,
+          alarms.push({
+            time: timeVal,
+            label: labelVal,
+            audioType: audioType,
+            speech: speechVal,
             triggered: false
-          };
+          });
 
-          alarms.push(snoozeAlarm);
           localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
           renderAlarms();
-        }
+          alarmForm.reset();
+          const defaultTime = new Date(Date.now() + 15 * 60000);
+          alarmTimeInput.value = formatForDateTimeInput(defaultTime);
+        });
+      }
 
-        if (alarmModal) {
-          alarmModal.classList.add('hidden');
-          alarmModal.classList.remove('flex');
-        }
-        activeTriggeredAlarm = null;
-      });
+      if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+          if (alarmModal) alarmModal.classList.add('hidden');
+          stopSound();
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        });
+      }
+
+      if (snoozeBtn) {
+        snoozeBtn.addEventListener('click', () => {
+          if (alarmModal) alarmModal.classList.add('hidden');
+          stopSound();
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          const snoozeTime = new Date(Date.now() + 5 * 60000);
+          alarms.push({
+            time: formatForDateTimeInput(snoozeTime),
+            label: 'Snoozed Directive',
+            audioType: 'custom-speech',
+            speech: 'Snooze period completed. Time to take action.',
+            triggered: false
+          });
+          localStorage.setItem('mindset_alarms', JSON.stringify(alarms));
+          renderAlarms();
+        });
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      try {
+        await initDB();
+        await loadRecordingsFromDB();
+      } catch(e) {
+        console.error("Database initialization failed:", e);
+      }
+
+      renderAlarms();
+      setupRecorder();
+      setInterval(checkAlarms, 1000);
     }
 
-    init();
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
